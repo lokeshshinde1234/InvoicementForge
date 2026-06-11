@@ -10,6 +10,7 @@ import {
 } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import type { Resolver } from "react-hook-form";
 import { z } from "zod";
 import { create } from "zustand";
 import { LineItemTable } from "@/components/invoice/LineItemTable";
@@ -127,7 +128,7 @@ function InvoiceBuilder() {
   const [newClientName, setNewClientName] = useState("");
   const [newClientEmail, setNewClientEmail] = useState("");
   const form = useForm<InvoiceFormValues>({
-    resolver: zodResolver(invoiceSchema),
+    resolver: zodResolver(invoiceSchema as never) as Resolver<InvoiceFormValues>,
     defaultValues: {
       clientId: "",
       sellerState: "MH",
