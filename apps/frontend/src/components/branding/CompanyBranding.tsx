@@ -171,25 +171,21 @@ export function companyInitials(name: string): string {
 export function absoluteLogoUrl(logoUrl?: string | null): string | null {
   if (!logoUrl) return null;
   if (/^https?:\/\//i.test(logoUrl) || logoUrl.startsWith("data:") || logoUrl.startsWith("blob:")) return logoUrl;
-  if (logoUrl.startsWith("/uploads/")) {
-    return `${apiAssetOrigin()}${logoUrl}`;
-  }
 
-  return `${apiAssetOrigin()}${logoUrl.startsWith("/") ? logoUrl : `/${logoUrl}`}`;
+  return `${apiAssetBase()}${logoUrl.startsWith("/") ? logoUrl : `/${logoUrl}`}`;
 }
 
-function apiAssetOrigin(): string {
+function apiAssetBase(): string {
   const trimmed = API_BASE_URL.replace(/\/$/, "");
 
   try {
     const url = new URL(trimmed, window.location.origin);
-    url.pathname = url.pathname.replace(/\/api\/?$/u, "");
     url.search = "";
     url.hash = "";
 
     return url.toString().replace(/\/$/, "");
   } catch {
-    return trimmed.replace(/\/api\/?$/u, "");
+    return trimmed;
   }
 }
 

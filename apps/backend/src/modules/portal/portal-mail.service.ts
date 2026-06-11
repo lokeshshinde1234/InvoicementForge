@@ -45,12 +45,7 @@ export class PortalMailService {
       return { delivered: false, mode: 'log' };
     }
 
-    const transporter = createTransport({
-      host,
-      port,
-      secure: port === 465,
-      auth: user && pass ? { user, pass } : undefined,
-    });
+    const transporter = this.createSmtpTransport({ host, port, user, pass });
 
     await transporter.sendMail({
       from,
@@ -121,12 +116,7 @@ export class PortalMailService {
       return { delivered: false, mode: 'log' };
     }
 
-    const transporter = createTransport({
-      host,
-      port,
-      secure: port === 465,
-      auth: user && pass ? { user, pass } : undefined,
-    });
+    const transporter = this.createSmtpTransport({ host, port, user, pass });
 
     await transporter.sendMail({
       from,
@@ -217,12 +207,7 @@ export class PortalMailService {
       return { delivered: false, mode: 'log' };
     }
 
-    const transporter = createTransport({
-      host,
-      port,
-      secure: port === 465,
-      auth: user && pass ? { user, pass } : undefined,
-    });
+    const transporter = this.createSmtpTransport({ host, port, user, pass });
 
     await transporter.sendMail({
       from,
@@ -309,6 +294,48 @@ export class PortalMailService {
     } catch {
       return null;
     }
+  }
+
+  private createSmtpTransport({
+    host,
+    port,
+    user,
+    pass,
+  }: {
+    host: string;
+    port: number;
+    user?: string;
+    pass?: string;
+  }) {
+    const secure = this.readBoolean(
+      process.env.SMTP_SECURE ?? process.env.MAIL_SECURE,
+    );
+    const requireTLS = this.readBoolean(
+      process.env.SMTP_REQUIRE_TLS ?? process.env.MAIL_REQUIRE_TLS,
+    );
+
+    return createTransport({
+      host,
+      port,
+      secure: secure ?? port === 465,
+      requireTLS,
+      auth: user && pass ? { user, pass } : undefined,
+      connectionTimeout: Number(
+        process.env.SMTP_CONNECTION_TIMEOUT_MS ?? 10000,
+      ),
+      greetingTimeout: Number(process.env.SMTP_GREETING_TIMEOUT_MS ?? 10000),
+      socketTimeout: Number(process.env.SMTP_SOCKET_TIMEOUT_MS ?? 20000),
+    });
+  }
+
+  private readBoolean(value?: string): boolean | undefined {
+    if (!value) return undefined;
+
+    const normalized = value.trim().toLowerCase();
+    if (['1', 'true', 'yes', 'on'].includes(normalized)) return true;
+    if (['0', 'false', 'no', 'off'].includes(normalized)) return false;
+
+    return undefined;
   }
 
   private escapeHtml(value: string): string {
