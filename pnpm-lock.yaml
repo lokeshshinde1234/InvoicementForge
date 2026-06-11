@@ -47,6 +47,9 @@ importers:
       handlebars:
         specifier: ^4.7.9
         version: 4.7.9
+      multer:
+        specifier: ^2.1.1
+        version: 2.1.1
       nodemailer:
         specifier: ^8.0.10
         version: 8.0.10
