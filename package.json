@@ -1,0 +1,19 @@
+{
+  "name": "invoiceforge",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "start": "pnpm --filter backend start:prod"
+  },
+  "devDependencies": {
+    "turbo": "^1.10.0",
+    "typeorm": "^0.3.20"
+  }
+}

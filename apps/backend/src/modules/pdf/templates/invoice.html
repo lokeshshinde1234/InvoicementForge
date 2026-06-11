@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Invoice {{invoice.invoiceNumber}}</title>
+    <style>
+      body {
+        color: #111827;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 14px;
+        margin: 0;
+      }
+
+      .header {
+        align-items: flex-start;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        padding-bottom: 24px;
+      }
+
+      h1 {
+        font-size: 28px;
+        margin: 0 0 8px;
+      }
+
+      .muted {
+        color: #6b7280;
+      }
+
+      table {
+        border-collapse: collapse;
+        margin-top: 32px;
+        width: 100%;
+      }
+
+      th,
+      td {
+        border-bottom: 1px solid #e5e7eb;
+        padding: 10px 8px;
+        text-align: left;
+      }
+
+      th {
+        background: #f9fafb;
+        font-size: 12px;
+        text-transform: uppercase;
+      }
+
+      .right {
+        text-align: right;
+      }
+
+      .totals {
+        margin-left: auto;
+        margin-top: 28px;
+        width: 280px;
+      }
+
+      .totals-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+      }
+
+      .grand-total {
+        border-top: 1px solid #111827;
+        font-size: 18px;
+        font-weight: 700;
+      }
+
+      .notes {
+        margin-top: 40px;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="header">
+      <div>
+        <h1>Invoice</h1>
+        <div class="muted">{{invoice.invoiceNumber}}</div>
+        <div class="muted">Status: {{invoice.status}}</div>
+      </div>
+      <div class="right">
+        <div>Client ID</div>
+        <strong>{{invoice.clientId}}</strong>
+        <div class="muted">Due: {{invoice.dueDate}}</div>
+      </div>
+    </section>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th class="right">Qty</th>
+          <th class="right">Unit Price</th>
+          <th class="right">Taxable</th>
+          <th class="right">Tax</th>
+          <th class="right">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each invoice.lineItems}}
+        <tr>
+          <td>{{description}}</td>
+          <td class="right">{{quantity}}</td>
+          <td class="right">{{unitPrice}}</td>
+          <td class="right">{{taxableAmount}}</td>
+          <td class="right">{{totalTax}}</td>
+          <td class="right">{{total}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+
+    <section class="totals">
+      <div class="totals-row">
+        <span>Subtotal</span>
+        <strong>{{invoice.subtotal}}</strong>
+      </div>
+      <div class="totals-row">
+        <span>Total tax</span>
+        <strong>{{invoice.totalTax}}</strong>
+      </div>
+      <div class="totals-row grand-total">
+        <span>Total</span>
+        <span>{{invoice.total}}</span>
+      </div>
+    </section>
+
+    <section class="notes">
+      <h2>Notes</h2>
+      <p>{{invoice.notes}}</p>
+      <h2>Terms</h2>
+      <p>{{invoice.terms}}</p>
+    </section>
+  </body>
+</html>

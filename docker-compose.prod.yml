@@ -1,0 +1,170 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-invoiceforge}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-invoiceforge}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-invoiceforge}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM node:24-alpine AS deps
+        WORKDIR /repo
+        RUN corepack enable
+        COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+        COPY apps/backend/package.json apps/backend/package.json
+        COPY apps/frontend/package.json apps/frontend/package.json
+        COPY packages/gst-calculator/package.json packages/gst-calculator/package.json
+        COPY packages/shared-types/package.json packages/shared-types/package.json
+        RUN pnpm install --frozen-lockfile
+
+        FROM node:24-alpine AS builder
+        WORKDIR /repo
+        RUN corepack enable
+        COPY --from=deps /repo/node_modules ./node_modules
+        COPY --from=deps /repo/apps/backend/node_modules ./apps/backend/node_modules
+        COPY --from=deps /repo/apps/frontend/node_modules ./apps/frontend/node_modules
+        COPY . .
+        RUN pnpm --filter backend build
+
+        FROM node:24-alpine AS runner
+        WORKDIR /repo
+        RUN corepack enable
+        RUN apk add --no-cache wget
+        ENV NODE_ENV=production
+        COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+        COPY apps/backend/package.json apps/backend/package.json
+        COPY packages/gst-calculator/package.json packages/gst-calculator/package.json
+        COPY packages/shared-types/package.json packages/shared-types/package.json
+        RUN pnpm install --prod --frozen-lockfile --filter backend
+        COPY --from=builder /repo/apps/backend/dist ./apps/backend/dist
+        EXPOSE 3001
+        CMD ["node", "apps/backend/dist/main.js"]
+    restart: unless-stopped
+    environment:
+      PORT: 3001
+      DATABASE_URL: postgres://${POSTGRES_USER:-invoiceforge}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-invoiceforge}
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET}
+      FRONTEND_URL: ${FRONTEND_URL}
+      RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID}
+      RAZORPAY_KEY_SECRET: ${RAZORPAY_KEY_SECRET}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      SMTP_FROM: ${SMTP_FROM}
+      SUPERADMIN_EMAIL: ${SUPERADMIN_EMAIL}
+      SUPERADMIN_PASSWORD: ${SUPERADMIN_PASSWORD}
+      TYPEORM_SYNCHRONIZE: ${TYPEORM_SYNCHRONIZE:-false}
+      REQUEST_BODY_LIMIT: ${REQUEST_BODY_LIMIT:-2mb}
+      RATE_LIMIT_WINDOW_MS: ${RATE_LIMIT_WINDOW_MS:-60000}
+      RATE_LIMIT_MAX: ${RATE_LIMIT_MAX:-240}
+      SENSITIVE_RATE_LIMIT_WINDOW_MS: ${SENSITIVE_RATE_LIMIT_WINDOW_MS:-900000}
+      SENSITIVE_RATE_LIMIT_MAX: ${SENSITIVE_RATE_LIMIT_MAX:-20}
+      DEMO_RATE_LIMIT_MAX: ${DEMO_RATE_LIMIT_MAX:-10}
+      PUPPETEER_SKIP_DOWNLOAD: "1"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3001/health | grep -q '\"status\":\"ok\"'"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    ports:
+      - "3001:3001"
+
+  web:
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-/api}
+      dockerfile_inline: |
+        FROM node:24-alpine AS deps
+        WORKDIR /repo
+        RUN corepack enable
+        COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+        COPY apps/backend/package.json apps/backend/package.json
+        COPY apps/frontend/package.json apps/frontend/package.json
+        COPY packages/gst-calculator/package.json packages/gst-calculator/package.json
+        COPY packages/shared-types/package.json packages/shared-types/package.json
+        RUN pnpm install --frozen-lockfile
+
+        FROM node:24-alpine AS builder
+        WORKDIR /repo
+        RUN corepack enable
+        ARG NEXT_PUBLIC_API_URL=/api
+        ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+        COPY --from=deps /repo/node_modules ./node_modules
+        COPY --from=deps /repo/apps/backend/node_modules ./apps/backend/node_modules
+        COPY --from=deps /repo/apps/frontend/node_modules ./apps/frontend/node_modules
+        COPY . .
+        RUN pnpm --filter frontend build
+
+        FROM node:24-alpine AS runner
+        WORKDIR /repo/apps/frontend
+        RUN corepack enable
+        ARG NEXT_PUBLIC_API_URL=/api
+        ENV NODE_ENV=production
+        ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+        COPY package.json /repo/package.json
+        COPY pnpm-lock.yaml pnpm-workspace.yaml /repo/
+        COPY apps/frontend/package.json ./package.json
+        COPY packages/gst-calculator/package.json /repo/packages/gst-calculator/package.json
+        COPY packages/shared-types/package.json /repo/packages/shared-types/package.json
+        WORKDIR /repo
+        RUN pnpm install --prod --frozen-lockfile --filter frontend
+        WORKDIR /repo/apps/frontend
+        COPY --from=builder /repo/apps/frontend/.next ./.next
+        COPY --from=builder /repo/apps/frontend/public ./public
+        COPY --from=builder /repo/apps/frontend/next.config.ts ./next.config.ts
+        EXPOSE 3000
+        CMD ["pnpm", "start"]
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-/api}
+      INTERNAL_API_URL: http://api:3001
+    depends_on:
+      - api
+    ports:
+      - "3000:3000"
+
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    depends_on:
+      - api
+      - web
+    ports:
+      - "80:80"
+    volumes:
+      - ./infra/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+
+volumes:
+  postgres-data:
+  redis-data:

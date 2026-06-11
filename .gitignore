@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.turbo/
+.next/
+apps/*/node_modules/
+packages/*/node_modules/
+.env
+apps/backend/.env
+apps/frontend/.env.local
+/.DS_Store
+npm-debug.log*
+*.log
+*.out.log
+*.err.log
+package-lock.json
+yarn.lock
