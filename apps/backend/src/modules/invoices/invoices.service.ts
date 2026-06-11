@@ -83,6 +83,8 @@ export class InvoicesService {
       throw new BadRequestException('At least one line item is required');
     }
 
+    await this.assertClientBelongsToTenant(dto.clientId, tenantId);
+
     if (dto.status === InvoiceStatus.SENT) {
       await this.subscriptionsService.assertCanSendDocument(tenantId);
     }
@@ -162,6 +164,10 @@ export class InvoicesService {
     tenantId: string,
   ): Promise<Invoice> {
     const invoice = await this.findOne(id, tenantId);
+    if (dto.clientId && dto.clientId !== invoice.clientId) {
+      await this.assertClientBelongsToTenant(dto.clientId, tenantId);
+    }
+
     const totals = dto.lineItems
       ? this.calculateTotals(dto.lineItems)
       : undefined;
@@ -369,6 +375,20 @@ export class InvoicesService {
 
   private roundCurrency(value: number): number {
     return Math.round((value + Number.EPSILON) * 100) / 100;
+  }
+
+  private async assertClientBelongsToTenant(
+    clientId: string,
+    tenantId: string,
+  ): Promise<void> {
+    const client = await this.clientsRepository.findOne({
+      where: { id: clientId, tenantId },
+      select: { id: true },
+    });
+
+    if (!client) {
+      throw new BadRequestException('Client does not belong to this workspace');
+    }
   }
 
   private absoluteLogoUrl(logoUrl?: string | null): string | null {

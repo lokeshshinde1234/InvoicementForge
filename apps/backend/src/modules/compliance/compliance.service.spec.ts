@@ -27,6 +27,7 @@ describe('ComplianceService', () => {
     const clientsRepository = {
       find: jest.fn().mockResolvedValue([]),
     };
+    const clientNotificationsRepository = {};
     const tenantsRepository = {
       findOne: jest.fn().mockResolvedValue(null),
     };
@@ -43,6 +44,7 @@ describe('ComplianceService', () => {
         {} as never,
         invoicesRepository as never,
         clientsRepository as never,
+        clientNotificationsRepository as never,
         businessSettingsRepository as never,
         tenantsRepository as never,
         {} as never,

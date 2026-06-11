@@ -89,6 +89,8 @@ export class ProposalsService {
       throw new BadRequestException('clientId is required');
     }
 
+    await this.assertClientBelongsToTenant(dto.clientId, tenantId);
+
     const blocks = this.normalizeBlocks(dto.blocks ?? []);
     if (
       dto.status === ProposalStatus.SENT &&
@@ -196,6 +198,10 @@ export class ProposalsService {
     tenantId: string,
   ): Promise<Proposal> {
     const proposal = await this.findOne(id, tenantId);
+    if (dto.clientId && dto.clientId !== proposal.clientId) {
+      await this.assertClientBelongsToTenant(dto.clientId, tenantId);
+    }
+
     const blocks = dto.blocks ? this.normalizeBlocks(dto.blocks) : undefined;
     if (
       dto.status === ProposalStatus.SENT &&
@@ -537,6 +543,20 @@ export class ProposalsService {
 
   private roundCurrency(value: number): number {
     return Math.round((value + Number.EPSILON) * 100) / 100;
+  }
+
+  private async assertClientBelongsToTenant(
+    clientId: string,
+    tenantId: string,
+  ): Promise<void> {
+    const client = await this.clientsRepository.findOne({
+      where: { id: clientId, tenantId },
+      select: { id: true },
+    });
+
+    if (!client) {
+      throw new BadRequestException('Client does not belong to this workspace');
+    }
   }
 
   private hasValidSignatureBlock(blocks: ProposalBlock[]): boolean {
