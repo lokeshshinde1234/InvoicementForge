@@ -20,6 +20,14 @@ type SmtpSettings = {
   url?: string;
 };
 
+type EmailSettings =
+  | ({ provider: 'smtp' } & SmtpSettings)
+  | {
+      provider: 'resend';
+      apiKey: string;
+      from: string;
+    };
+
 @Injectable()
 export class PortalMailService {
   private readonly logger = new Logger(PortalMailService.name);
@@ -39,7 +47,7 @@ export class PortalMailService {
   }): Promise<{ delivered: boolean; mode: 'smtp' | 'log' }> {
     const safeCompanyName = this.escapeHtml(companyName);
     const safeClientName = this.escapeHtml(clientName);
-    const settings = this.readSmtpSettings(
+    const settings = this.readEmailSettings(
       'Client portal OTP email cannot be delivered.',
       `${companyName} client portal OTP for ${email}: ${otp}`,
     );
@@ -96,7 +104,7 @@ export class PortalMailService {
       logoAltText || `${accountName} logo`,
     );
     const safeHeading = this.escapeHtml(subject);
-    const settings = this.readSmtpSettings(
+    const settings = this.readEmailSettings(
       'Password reset email cannot be delivered.',
       `${accountName} password reset link for ${email}: ${resetUrl}`,
     );
@@ -173,7 +181,7 @@ export class PortalMailService {
           maximumFractionDigits: 2,
         }).format(amount)
       : `${currency} ${String(total)}`;
-    const settings = this.readSmtpSettings(
+    const settings = this.readEmailSettings(
       'Invoice email cannot be delivered.',
       `${companyName} invoice ${invoiceNumber} for ${email}: ${portalUrl}`,
     );
@@ -309,10 +317,11 @@ export class PortalMailService {
     });
   }
 
-  private readSmtpSettings(
+  private readEmailSettings(
     productionError: string,
     logFallbackMessage: string,
-  ): SmtpSettings | null {
+  ): EmailSettings | null {
+    const resendApiKey = process.env.RESEND_API_KEY?.trim();
     const url =
       process.env.SMTP_URL ??
       process.env.MAIL_URL ??
@@ -324,6 +333,7 @@ export class PortalMailService {
       process.env.EMAIL_FROM ??
       process.env.MAIL_FROM_ADDRESS ??
       process.env.SENDER_EMAIL ??
+      process.env.RESEND_FROM ??
       process.env.SMTP_USER ??
       process.env.MAIL_USER ??
       process.env.EMAIL_SERVER_USER;
@@ -352,24 +362,35 @@ export class PortalMailService {
       process.env.MAIL_PASSWORD ??
       process.env.EMAIL_SERVER_PASSWORD;
 
+    if (resendApiKey && from) {
+      return { provider: 'resend', apiKey: resendApiKey, from };
+    }
+
     if (!from || (!url && (!host || !Number.isFinite(port)))) {
       if (process.env.NODE_ENV === 'production') {
         throw new ServiceUnavailableException(
-          `SMTP is not configured. ${productionError}`,
+          `Email provider is not configured. ${productionError}`,
         );
       }
 
-      this.logger.warn(`SMTP is not configured. ${logFallbackMessage}`);
+      this.logger.warn(
+        `Email provider is not configured. ${logFallbackMessage}`,
+      );
       return null;
     }
 
-    return { from, host, port, user, pass, url };
+    return { provider: 'smtp', from, host, port, user, pass, url };
   }
 
   private async sendSmtpMail(
-    settings: SmtpSettings,
+    settings: EmailSettings,
     mail: SendMailOptions,
   ): Promise<void> {
+    if (settings.provider === 'resend') {
+      await this.sendResendMail(settings, mail);
+      return;
+    }
+
     const transporter = this.createSmtpTransport(settings);
 
     try {
@@ -397,6 +418,50 @@ export class PortalMailService {
       );
     } finally {
       transporter.close();
+    }
+  }
+
+  private async sendResendMail(
+    settings: Extract<EmailSettings, { provider: 'resend' }>,
+    mail: SendMailOptions,
+  ): Promise<void> {
+    try {
+      const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${settings.apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: settings.from,
+          to: this.normalizeEnvelopeRecipients(mail.to),
+          subject: mail.subject,
+          html: typeof mail.html === 'string' ? mail.html : undefined,
+          text: typeof mail.text === 'string' ? mail.text : undefined,
+        }),
+      });
+      const body = (await response.json().catch(() => null)) as
+        | { id?: string; message?: string; error?: string }
+        | null;
+
+      if (!response.ok) {
+        throw new Error(
+          body?.message ?? body?.error ?? `Resend HTTP ${response.status}`,
+        );
+      }
+
+      this.logger.log(
+        `Resend email accepted for ${String(mail.to)} (${body?.id ?? 'no-message-id'}).`,
+      );
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Unknown Resend error';
+      this.logger.error(
+        `Resend delivery failed for ${String(mail.to)}: ${message}`,
+      );
+      throw new ServiceUnavailableException(
+        'Email could not be delivered right now. Please verify email provider settings and try again.',
+      );
     }
   }
 

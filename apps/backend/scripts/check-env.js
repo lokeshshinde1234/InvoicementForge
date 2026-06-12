@@ -43,17 +43,21 @@ const hasMailFrom = Boolean(
     process.env.MAIL_FROM ||
     process.env.EMAIL_FROM ||
     process.env.MAIL_FROM_ADDRESS ||
-    process.env.SENDER_EMAIL,
+    process.env.SENDER_EMAIL ||
+    process.env.RESEND_FROM,
 );
+const hasResend = Boolean(process.env.RESEND_API_KEY && hasMailFrom);
 if (process.env.NODE_ENV === 'production') {
-  if (!hasMailFrom) missing.push('SMTP_FROM or EMAIL_FROM');
-  if (!hasSmtpHost && !hasSmtpUrl) missing.push('SMTP_HOST or SMTP_URL');
+  if (!hasMailFrom) missing.push('SMTP_FROM, EMAIL_FROM, or RESEND_FROM');
+  if (!hasResend && !hasSmtpHost && !hasSmtpUrl) {
+    missing.push('SMTP_HOST, SMTP_URL, or RESEND_API_KEY');
+  }
 }
 if (missing.length === 0) {
   console.log('All required env vars present.');
-  if (!hasMailFrom || (!hasSmtpHost && !hasSmtpUrl)) {
+  if (!hasMailFrom || (!hasResend && !hasSmtpHost && !hasSmtpUrl)) {
     console.warn(
-      'Warning: SMTP is not fully configured. Set SMTP_FROM plus SMTP_HOST, or set SMTP_FROM plus SMTP_URL.',
+      'Warning: Email is not fully configured. Set RESEND_API_KEY plus RESEND_FROM, or set SMTP_FROM plus SMTP_HOST/SMTP_URL.',
     );
   }
   const smtpPort =
