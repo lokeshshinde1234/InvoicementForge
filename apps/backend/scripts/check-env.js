@@ -20,24 +20,49 @@ const required = [
 
 if (process.env.NODE_ENV === 'production') {
   required.push(
-    'SMTP_HOST',
-    'SMTP_FROM',
-    'FRONTEND_URL',
     'SUPERADMIN_EMAIL',
     'SUPERADMIN_PASSWORD',
   );
 }
 
 const missing = required.filter((k) => !process.env[k]);
+const hasSmtpHost = Boolean(
+  process.env.SMTP_HOST ||
+    process.env.MAIL_HOST ||
+    process.env.EMAIL_HOST ||
+    process.env.EMAIL_SERVER_HOST,
+);
+const hasSmtpUrl = Boolean(
+  process.env.SMTP_URL ||
+    process.env.MAIL_URL ||
+    process.env.EMAIL_SERVER ||
+    process.env.EMAIL_SERVER_URL,
+);
+const hasMailFrom = Boolean(
+  process.env.SMTP_FROM ||
+    process.env.MAIL_FROM ||
+    process.env.EMAIL_FROM ||
+    process.env.MAIL_FROM_ADDRESS ||
+    process.env.SENDER_EMAIL,
+);
+if (process.env.NODE_ENV === 'production') {
+  if (!hasMailFrom) missing.push('SMTP_FROM or EMAIL_FROM');
+  if (!hasSmtpHost && !hasSmtpUrl) missing.push('SMTP_HOST or SMTP_URL');
+}
 if (missing.length === 0) {
   console.log('All required env vars present.');
-  if (!process.env.SMTP_HOST || !process.env.SMTP_FROM) {
+  if (!hasMailFrom || (!hasSmtpHost && !hasSmtpUrl)) {
     console.warn(
-      'Warning: SMTP_HOST and SMTP_FROM are not configured. OTP emails will only be logged outside production.',
+      'Warning: SMTP is not fully configured. Set SMTP_FROM plus SMTP_HOST, or set SMTP_FROM plus SMTP_URL.',
     );
   }
-  if (process.env.SMTP_PORT && !Number.isFinite(Number(process.env.SMTP_PORT))) {
-    console.error('SMTP_PORT must be a number.');
+  const smtpPort =
+    process.env.SMTP_PORT ??
+    process.env.MAIL_PORT ??
+    process.env.EMAIL_PORT ??
+    process.env.EMAIL_SERVER_PORT;
+  if (smtpPort && !Number.isFinite(Number(smtpPort))) {
+    console.error('SMTP port must be a number.');
     process.exit(1);
   }
   process.exit(0);

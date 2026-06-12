@@ -13,10 +13,11 @@ import { join, normalize } from 'path';
 
 type SmtpSettings = {
   from: string;
-  host: string;
-  port: number;
+  host?: string;
+  port?: number;
   user?: string;
   pass?: string;
+  url?: string;
 };
 
 @Injectable()
@@ -266,17 +267,12 @@ export class PortalMailService {
     }
   }
 
-  private createSmtpTransport({
-    host,
-    port,
-    user,
-    pass,
-  }: {
-    host: string;
-    port: number;
-    user?: string;
-    pass?: string;
-  }) {
+  private createSmtpTransport(settings: SmtpSettings) {
+    if (settings.url) {
+      return createTransport(settings.url);
+    }
+
+    const { host, port, user, pass } = settings;
     const service = process.env.SMTP_SERVICE ?? process.env.MAIL_SERVICE;
     const secure = this.readBoolean(
       process.env.SMTP_SECURE ?? process.env.MAIL_SECURE,
@@ -295,7 +291,7 @@ export class PortalMailService {
     return createTransport({
       service,
       host,
-      port,
+      port: port ?? 587,
       secure: secure ?? port === 465,
       ignoreTLS,
       requireTLS,
@@ -317,32 +313,46 @@ export class PortalMailService {
     productionError: string,
     logFallbackMessage: string,
   ): SmtpSettings | null {
+    const url =
+      process.env.SMTP_URL ??
+      process.env.MAIL_URL ??
+      process.env.EMAIL_SERVER ??
+      process.env.EMAIL_SERVER_URL;
     const from =
       process.env.SMTP_FROM ??
       process.env.MAIL_FROM ??
       process.env.EMAIL_FROM ??
+      process.env.MAIL_FROM_ADDRESS ??
+      process.env.SENDER_EMAIL ??
       process.env.SMTP_USER ??
-      process.env.MAIL_USER;
+      process.env.MAIL_USER ??
+      process.env.EMAIL_SERVER_USER;
     const host =
       process.env.SMTP_HOST ??
       process.env.MAIL_HOST ??
-      process.env.EMAIL_HOST;
+      process.env.EMAIL_HOST ??
+      process.env.EMAIL_SERVER_HOST;
     const port = Number(
       process.env.SMTP_PORT ??
         process.env.MAIL_PORT ??
         process.env.EMAIL_PORT ??
+        process.env.EMAIL_SERVER_PORT ??
         587,
     );
     const user =
       process.env.SMTP_USER ??
       process.env.MAIL_USER ??
-      process.env.EMAIL_USER;
+      process.env.EMAIL_USER ??
+      process.env.EMAIL_SERVER_USER;
     const pass =
       process.env.SMTP_PASS ??
       process.env.MAIL_PASS ??
-      process.env.EMAIL_PASS;
+      process.env.EMAIL_PASS ??
+      process.env.SMTP_PASSWORD ??
+      process.env.MAIL_PASSWORD ??
+      process.env.EMAIL_SERVER_PASSWORD;
 
-    if (!host || !from || !Number.isFinite(port)) {
+    if (!from || (!url && (!host || !Number.isFinite(port)))) {
       if (process.env.NODE_ENV === 'production') {
         throw new ServiceUnavailableException(
           `SMTP is not configured. ${productionError}`,
@@ -353,7 +363,7 @@ export class PortalMailService {
       return null;
     }
 
-    return { from, host, port, user, pass };
+    return { from, host, port, user, pass, url };
   }
 
   private async sendSmtpMail(
