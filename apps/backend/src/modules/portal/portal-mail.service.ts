@@ -362,11 +362,16 @@ export class PortalMailService {
       process.env.MAIL_PASSWORD ??
       process.env.EMAIL_SERVER_PASSWORD;
 
+    const parsedHost = this.parseSmtpHost(host, port);
+
     if (resendApiKey && from) {
       return { provider: 'resend', apiKey: resendApiKey, from };
     }
 
-    if (!from || (!url && (!host || !Number.isFinite(port)))) {
+    if (
+      !from ||
+      (!url && (!parsedHost.host || !Number.isFinite(parsedHost.port)))
+    ) {
       if (process.env.NODE_ENV === 'production') {
         throw new ServiceUnavailableException(
           `Email provider is not configured. ${productionError}`,
@@ -379,7 +384,15 @@ export class PortalMailService {
       return null;
     }
 
-    return { provider: 'smtp', from, host, port, user, pass, url };
+    return {
+      provider: 'smtp',
+      from,
+      host: parsedHost.host,
+      port: parsedHost.port,
+      user,
+      pass,
+      url,
+    };
   }
 
   private async sendSmtpMail(
@@ -502,6 +515,37 @@ export class PortalMailService {
     }
 
     return 'Email could not be delivered right now. Please verify SMTP settings and try again.';
+  }
+
+  private parseSmtpHost(
+    value: string | undefined,
+    fallbackPort: number,
+  ): { host?: string; port?: number } {
+    const trimmed = value?.trim();
+
+    if (!trimmed) {
+      return { host: undefined, port: fallbackPort };
+    }
+
+    try {
+      const parsed = new URL(
+        trimmed.includes('://') ? trimmed : `smtp://${trimmed}`,
+      );
+      const port = parsed.port ? Number(parsed.port) : fallbackPort;
+
+      return {
+        host: parsed.hostname || trimmed,
+        port,
+      };
+    } catch {
+      const [host, portValue] = trimmed.split(':');
+      const port = portValue ? Number(portValue) : fallbackPort;
+
+      return {
+        host,
+        port,
+      };
+    }
   }
 
   private readBoolean(value?: string): boolean | undefined {

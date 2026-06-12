@@ -27,6 +27,8 @@ export class AppController {
     hostConfigured: boolean;
     urlConfigured: boolean;
     resendConfigured: boolean;
+    smtpPort: number | null;
+    smtpSecure: boolean | null;
     required: string[];
   } {
     const fromConfigured = Boolean(
@@ -50,6 +52,19 @@ export class AppController {
         process.env.EMAIL_SERVER_URL,
     );
     const resendConfigured = Boolean(process.env.RESEND_API_KEY);
+    const smtpPortValue =
+      process.env.SMTP_PORT ??
+      process.env.MAIL_PORT ??
+      process.env.EMAIL_PORT ??
+      process.env.EMAIL_SERVER_PORT;
+    const smtpPort = smtpPortValue ? Number(smtpPortValue) : null;
+    const smtpSecureValue = process.env.SMTP_SECURE ?? process.env.MAIL_SECURE;
+    const smtpSecure =
+      smtpSecureValue === undefined
+        ? smtpPort === 465
+        : ['1', 'true', 'yes', 'on'].includes(
+            smtpSecureValue.trim().toLowerCase(),
+          );
     const provider =
       resendConfigured && fromConfigured
         ? 'resend'
@@ -64,6 +79,8 @@ export class AppController {
       hostConfigured,
       urlConfigured,
       resendConfigured,
+      smtpPort: Number.isFinite(smtpPort) ? smtpPort : null,
+      smtpSecure,
       required:
         provider === 'none'
           ? [
