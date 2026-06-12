@@ -4,8 +4,20 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { existsSync } from 'fs';
-import { createTransport } from 'nodemailer';
+import {
+  createTransport,
+  type SentMessageInfo,
+  type SendMailOptions,
+} from 'nodemailer';
 import { join, normalize } from 'path';
+
+type SmtpSettings = {
+  from: string;
+  host: string;
+  port: number;
+  user?: string;
+  pass?: string;
+};
 
 @Injectable()
 export class PortalMailService {
@@ -26,29 +38,15 @@ export class PortalMailService {
   }): Promise<{ delivered: boolean; mode: 'smtp' | 'log' }> {
     const safeCompanyName = this.escapeHtml(companyName);
     const safeClientName = this.escapeHtml(clientName);
-    const from = process.env.SMTP_FROM ?? process.env.MAIL_FROM;
-    const host = process.env.SMTP_HOST ?? process.env.MAIL_HOST;
-    const port = Number(process.env.SMTP_PORT ?? process.env.MAIL_PORT ?? 587);
-    const user = process.env.SMTP_USER ?? process.env.MAIL_USER;
-    const pass = process.env.SMTP_PASS ?? process.env.MAIL_PASS;
+    const settings = this.readSmtpSettings(
+      'Client portal OTP email cannot be delivered.',
+      `${companyName} client portal OTP for ${email}: ${otp}`,
+    );
 
-    if (!host || !from) {
-      if (process.env.NODE_ENV === 'production') {
-        throw new ServiceUnavailableException(
-          'SMTP is not configured. Client portal OTP email cannot be delivered.',
-        );
-      }
+    if (!settings) return { delivered: false, mode: 'log' };
 
-      this.logger.warn(
-        `SMTP is not configured. ${companyName} client portal OTP for ${email}: ${otp}`,
-      );
-      return { delivered: false, mode: 'log' };
-    }
-
-    const transporter = this.createSmtpTransport({ host, port, user, pass });
-
-    await transporter.sendMail({
-      from,
+    await this.sendSmtpMail(settings, {
+      from: settings.from,
       to: email,
       subject: `${companyName} client portal OTP`,
       text: [
@@ -97,29 +95,15 @@ export class PortalMailService {
       logoAltText || `${accountName} logo`,
     );
     const safeHeading = this.escapeHtml(subject);
-    const from = process.env.SMTP_FROM ?? process.env.MAIL_FROM;
-    const host = process.env.SMTP_HOST ?? process.env.MAIL_HOST;
-    const port = Number(process.env.SMTP_PORT ?? process.env.MAIL_PORT ?? 587);
-    const user = process.env.SMTP_USER ?? process.env.MAIL_USER;
-    const pass = process.env.SMTP_PASS ?? process.env.MAIL_PASS;
+    const settings = this.readSmtpSettings(
+      'Password reset email cannot be delivered.',
+      `${accountName} password reset link for ${email}: ${resetUrl}`,
+    );
 
-    if (!host || !from) {
-      if (process.env.NODE_ENV === 'production') {
-        throw new ServiceUnavailableException(
-          'SMTP is not configured. Password reset email cannot be delivered.',
-        );
-      }
+    if (!settings) return { delivered: false, mode: 'log' };
 
-      this.logger.warn(
-        `SMTP is not configured. ${accountName} password reset link for ${email}: ${resetUrl}`,
-      );
-      return { delivered: false, mode: 'log' };
-    }
-
-    const transporter = this.createSmtpTransport({ host, port, user, pass });
-
-    await transporter.sendMail({
-      from,
+    await this.sendSmtpMail(settings, {
+      from: settings.from,
       to: email,
       subject,
       attachments: logo.attachment ? [logo.attachment] : undefined,
@@ -188,29 +172,15 @@ export class PortalMailService {
           maximumFractionDigits: 2,
         }).format(amount)
       : `${currency} ${String(total)}`;
-    const from = process.env.SMTP_FROM ?? process.env.MAIL_FROM;
-    const host = process.env.SMTP_HOST ?? process.env.MAIL_HOST;
-    const port = Number(process.env.SMTP_PORT ?? process.env.MAIL_PORT ?? 587);
-    const user = process.env.SMTP_USER ?? process.env.MAIL_USER;
-    const pass = process.env.SMTP_PASS ?? process.env.MAIL_PASS;
+    const settings = this.readSmtpSettings(
+      'Invoice email cannot be delivered.',
+      `${companyName} invoice ${invoiceNumber} for ${email}: ${portalUrl}`,
+    );
 
-    if (!host || !from) {
-      if (process.env.NODE_ENV === 'production') {
-        throw new ServiceUnavailableException(
-          'SMTP is not configured. Invoice email cannot be delivered.',
-        );
-      }
+    if (!settings) return { delivered: false, mode: 'log' };
 
-      this.logger.warn(
-        `SMTP is not configured. ${companyName} invoice ${invoiceNumber} for ${email}: ${portalUrl}`,
-      );
-      return { delivered: false, mode: 'log' };
-    }
-
-    const transporter = this.createSmtpTransport({ host, port, user, pass });
-
-    await transporter.sendMail({
-      from,
+    await this.sendSmtpMail(settings, {
+      from: settings.from,
       to: email,
       subject: `${companyName} invoice ${invoiceNumber}`,
       text: [
@@ -307,25 +277,146 @@ export class PortalMailService {
     user?: string;
     pass?: string;
   }) {
+    const service = process.env.SMTP_SERVICE ?? process.env.MAIL_SERVICE;
     const secure = this.readBoolean(
       process.env.SMTP_SECURE ?? process.env.MAIL_SECURE,
+    );
+    const ignoreTLS = this.readBoolean(
+      process.env.SMTP_IGNORE_TLS ?? process.env.MAIL_IGNORE_TLS,
     );
     const requireTLS = this.readBoolean(
       process.env.SMTP_REQUIRE_TLS ?? process.env.MAIL_REQUIRE_TLS,
     );
+    const rejectUnauthorized = this.readBoolean(
+      process.env.SMTP_TLS_REJECT_UNAUTHORIZED ??
+        process.env.MAIL_TLS_REJECT_UNAUTHORIZED,
+    );
 
     return createTransport({
+      service,
       host,
       port,
       secure: secure ?? port === 465,
+      ignoreTLS,
       requireTLS,
       auth: user && pass ? { user, pass } : undefined,
+      name: process.env.SMTP_NAME ?? process.env.MAIL_NAME,
       connectionTimeout: Number(
         process.env.SMTP_CONNECTION_TIMEOUT_MS ?? 10000,
       ),
       greetingTimeout: Number(process.env.SMTP_GREETING_TIMEOUT_MS ?? 10000),
       socketTimeout: Number(process.env.SMTP_SOCKET_TIMEOUT_MS ?? 20000),
+      tls:
+        rejectUnauthorized === undefined
+          ? undefined
+          : { rejectUnauthorized },
     });
+  }
+
+  private readSmtpSettings(
+    productionError: string,
+    logFallbackMessage: string,
+  ): SmtpSettings | null {
+    const from =
+      process.env.SMTP_FROM ??
+      process.env.MAIL_FROM ??
+      process.env.EMAIL_FROM ??
+      process.env.SMTP_USER ??
+      process.env.MAIL_USER;
+    const host =
+      process.env.SMTP_HOST ??
+      process.env.MAIL_HOST ??
+      process.env.EMAIL_HOST;
+    const port = Number(
+      process.env.SMTP_PORT ??
+        process.env.MAIL_PORT ??
+        process.env.EMAIL_PORT ??
+        587,
+    );
+    const user =
+      process.env.SMTP_USER ??
+      process.env.MAIL_USER ??
+      process.env.EMAIL_USER;
+    const pass =
+      process.env.SMTP_PASS ??
+      process.env.MAIL_PASS ??
+      process.env.EMAIL_PASS;
+
+    if (!host || !from || !Number.isFinite(port)) {
+      if (process.env.NODE_ENV === 'production') {
+        throw new ServiceUnavailableException(
+          `SMTP is not configured. ${productionError}`,
+        );
+      }
+
+      this.logger.warn(`SMTP is not configured. ${logFallbackMessage}`);
+      return null;
+    }
+
+    return { from, host, port, user, pass };
+  }
+
+  private async sendSmtpMail(
+    settings: SmtpSettings,
+    mail: SendMailOptions,
+  ): Promise<void> {
+    const transporter = this.createSmtpTransport(settings);
+
+    try {
+      await transporter.verify();
+      const info = (await transporter.sendMail({
+        ...mail,
+        envelope: this.createEnvelope(settings, mail),
+      })) as SentMessageInfo;
+      this.logger.log(
+        `SMTP email accepted for ${String(mail.to)} (${info.messageId ?? 'no-message-id'}).`,
+      );
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Unknown SMTP error';
+      const code =
+        typeof error === 'object' && error && 'code' in error
+          ? String((error as { code?: unknown }).code)
+          : 'SMTP_ERROR';
+
+      this.logger.error(
+        `SMTP delivery failed for ${String(mail.to)} [${code}]: ${message}`,
+      );
+      throw new ServiceUnavailableException(
+        'Email could not be delivered right now. Please verify SMTP settings and try again.',
+      );
+    } finally {
+      transporter.close();
+    }
+  }
+
+  private createEnvelope(settings: SmtpSettings, mail: SendMailOptions) {
+    const from = this.extractEmailAddress(settings.from) ?? settings.user;
+    const to = this.normalizeEnvelopeRecipients(mail.to);
+
+    if (!from || to.length === 0) return undefined;
+
+    return {
+      from,
+      to,
+    };
+  }
+
+  private normalizeEnvelopeRecipients(value: SendMailOptions['to']): string[] {
+    const values = Array.isArray(value) ? value : value ? [value] : [];
+
+    return values
+      .map((item) =>
+        typeof item === 'string'
+          ? this.extractEmailAddress(item)
+          : this.extractEmailAddress(item.address),
+      )
+      .filter((item): item is string => Boolean(item));
+  }
+
+  private extractEmailAddress(value?: string): string | undefined {
+    const match = value?.match(/<([^>]+)>/);
+    return (match?.[1] ?? value)?.trim() || undefined;
   }
 
   private readBoolean(value?: string): boolean | undefined {

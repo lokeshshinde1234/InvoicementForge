@@ -22,6 +22,7 @@ if (process.env.NODE_ENV === 'production') {
   required.push(
     'SMTP_HOST',
     'SMTP_FROM',
+    'FRONTEND_URL',
     'SUPERADMIN_EMAIL',
     'SUPERADMIN_PASSWORD',
   );
@@ -34,6 +35,10 @@ if (missing.length === 0) {
     console.warn(
       'Warning: SMTP_HOST and SMTP_FROM are not configured. OTP emails will only be logged outside production.',
     );
+  }
+  if (process.env.SMTP_PORT && !Number.isFinite(Number(process.env.SMTP_PORT))) {
+    console.error('SMTP_PORT must be a number.');
+    process.exit(1);
   }
   process.exit(0);
 }
