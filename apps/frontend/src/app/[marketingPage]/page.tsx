@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CollectionPage } from "@/components/marketing/CollectionPage";
 
@@ -118,6 +119,30 @@ type PageParams = {
     marketingPage: string;
   }>;
 };
+
+export async function generateMetadata({
+  params,
+}: PageParams): Promise<Metadata> {
+  const { marketingPage } = await params;
+  const page = pages[marketingPage as keyof typeof pages];
+
+  if (!page) {
+    return {};
+  }
+
+  return {
+    title: page.title,
+    description: page.copy,
+    alternates: {
+      canonical: `/${marketingPage}`,
+    },
+    openGraph: {
+      title: page.title,
+      description: page.copy,
+      url: `/${marketingPage}`,
+    },
+  };
+}
 
 export default async function MarketingDynamicPage({ params }: PageParams) {
   const { marketingPage } = await params;

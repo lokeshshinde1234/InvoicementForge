@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { SiteFooter } from "@/components/marketing/SiteFooter";
 import { SiteHeader } from "@/components/marketing/SiteHeader";
 import { templateCards } from "@/components/marketing/site-data";
@@ -15,13 +16,24 @@ export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
-}) {
+}): Promise<Metadata> {
   const { slug } = await params;
   const template = getTemplateBySlug(slug);
 
   return {
-    title: template ? `${template.title} Template | InvoiceForge` : "Template | InvoiceForge",
+    title: template ? `${template.title} Proposal Template` : "Proposal Template",
     description: template?.description,
+    alternates: {
+      canonical: `/templates/${slug}`,
+    },
+    openGraph: template
+      ? {
+          title: `${template.title} Proposal Template`,
+          description: template.description,
+          url: `/templates/${slug}`,
+          images: [{ url: template.image, alt: template.title }],
+        }
+      : undefined,
   };
 }
 
