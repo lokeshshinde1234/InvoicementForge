@@ -37,19 +37,19 @@ export function MarketingPage() {
 
 function Hero() {
   return (
-    <section className="brand-grid landing-hero-surface border-b border-amber-200/70">
-      <div className="relative mx-auto grid min-h-[calc(100vh-4rem)] max-w-7xl items-center gap-12 px-4 py-14 sm:px-6 lg:grid-cols-[1fr_540px] lg:px-8">
+    <section className="brand-grid landing-hero-surface border-b border-slate-200">
+      <div className="relative mx-auto grid min-h-[calc(100vh-4rem)] max-w-7xl items-center gap-12 px-4 py-14 sm:px-6 lg:grid-cols-[1fr_560px] lg:px-8">
         <div>
-          <p className="inline-flex rounded-full border border-teal-200 bg-white/70 px-4 py-2 text-sm font-semibold uppercase tracking-wide text-teal-700 shadow-sm backdrop-blur">
-            Proposal, quote, sign, invoice
+          <p className="inline-flex rounded-md border border-teal-200 bg-white/80 px-3 py-2 text-sm font-semibold uppercase tracking-wide text-teal-700 shadow-sm backdrop-blur">
+            Proposal to invoice operations
           </p>
-          <h1 className="mt-4 max-w-4xl text-4xl font-semibold leading-tight tracking-tight text-slate-950 sm:text-6xl">
-            Turn proposal chaos into a cleaner close.
+          <h1 className="mt-5 max-w-4xl text-4xl font-semibold leading-tight tracking-tight text-slate-950 sm:text-6xl">
+            Close client work from one disciplined revenue desk.
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
-            InvoiceForge gives your team the Proposify-style structure buyers
-            expect: branded proposals, reusable templates, quoting, e-signatures,
-            approvals, client portals, and GST-ready invoices.
+            InvoiceForge helps service teams prepare branded proposals, collect
+            approvals, issue GST-ready invoices, and keep clients moving through
+            a secure portal without stitching together four different tools.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link href="/signup" className="inline-flex h-12 items-center justify-center rounded-md bg-teal-600 px-6 text-sm font-semibold text-white shadow-lg shadow-teal-900/20 transition hover:-translate-y-0.5 hover:bg-teal-700">
@@ -59,41 +59,52 @@ function Hero() {
               Book a demo
             </Link>
           </div>
-          <div className="mt-8 grid max-w-xl gap-3 text-sm text-slate-700 sm:grid-cols-3">
-            {["14-day trial", "No credit card", "Connected to your API"].map((item) => (
-              <span key={item} className="rounded-md border border-white/70 bg-white/60 px-3 py-2 font-semibold shadow-sm backdrop-blur">
-                {item}
+          <div className="mt-8 grid max-w-2xl gap-3 text-sm text-slate-700 sm:grid-cols-3">
+            {[
+              ["GST-ready", "CGST, SGST, IGST"],
+              ["Client portal", "Docs, payments, status"],
+              ["Secure reset", "Email-based access"],
+            ].map(([label, copy]) => (
+              <span key={label} className="rounded-md border border-white/80 bg-white/70 px-3 py-3 shadow-sm backdrop-blur">
+                <span className="block font-semibold text-slate-950">{label}</span>
+                <span className="mt-1 block text-xs text-slate-500">{copy}</span>
               </span>
             ))}
           </div>
         </div>
-        <div className="hero-accent-card proposal-shadow rounded-lg border border-white/80 p-4 backdrop-blur">
+        <div className="hero-accent-card proposal-shadow rounded-lg border border-white/80 bg-white/80 p-4 backdrop-blur">
           <div className="flex items-center justify-between border-b border-slate-200 pb-4">
             <div>
-              <p className="font-semibold">Proposal workspace</p>
-              <p className="text-sm text-slate-500">Client-facing deal room</p>
+              <p className="font-semibold">Client workspace</p>
+              <p className="text-sm text-slate-500">Proposal, invoice, payment status</p>
             </div>
-            <span className="rounded-md bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">
-              Viewed 3 times
+            <span className="rounded-md bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">
+              Live portal
             </span>
           </div>
           <div className="mt-4 grid gap-3">
             {[
-              ["Cover page", "Ready"],
-              ["Scope of work", "Approved"],
-              ["Interactive quote", "INR 4,80,000"],
-              ["Terms", "Locked"],
-              ["Signature", "Waiting"],
+              ["Proposal", "Awaiting signature"],
+              ["GST invoice", "Ready to send"],
+              ["Payment link", "Razorpay enabled"],
+              ["Client message", "Unread"],
+              ["Password reset", "Email protected"],
             ].map(([label, value]) => (
-              <div key={label} className="hover-lift flex items-center justify-between rounded-md border border-slate-200 p-4">
+              <div key={label} className="hover-lift flex items-center justify-between rounded-md border border-slate-200 bg-white/80 p-4">
                 <span className="font-medium">{label}</span>
                 <span className="text-sm text-slate-500">{value}</span>
               </div>
             ))}
           </div>
-          <div className="mt-4 rounded-md bg-slate-950 p-5 text-white">
-            <p className="text-sm text-slate-300">Close-ready value</p>
-            <p className="mt-2 text-3xl font-semibold">INR 4.8L</p>
+          <div className="mt-4 grid grid-cols-2 gap-3">
+            <div className="rounded-md bg-slate-950 p-5 text-white">
+              <p className="text-sm text-slate-300">Open value</p>
+              <p className="mt-2 text-3xl font-semibold">INR 4.8L</p>
+            </div>
+            <div className="rounded-md border border-slate-200 bg-white p-5">
+              <p className="text-sm text-slate-500">Next action</p>
+              <p className="mt-2 text-lg font-semibold text-slate-950">Send reminder</p>
+            </div>
           </div>
         </div>
       </div>
@@ -105,11 +116,11 @@ function LogoStrip() {
   return (
     <section className="border-b border-slate-200 bg-white py-8">
       <p className="text-center text-sm font-medium text-slate-500">
-        Built for agencies, consultants, software teams, and service businesses.
+        Built for service businesses that need documents, tax, and client communication in one place.
       </p>
       <div className="mx-auto mt-6 grid max-w-7xl grid-cols-2 gap-3 px-4 sm:grid-cols-4 lg:grid-cols-6">
-        {["Northstar", "UrbanLedger", "BrightDesk", "CloudPeak", "ApexWorks", "Finovo"].map((name) => (
-          <div key={name} className="hover-lift rounded-md border border-slate-200 px-4 py-3 text-center text-sm font-semibold text-slate-600">
+        {["Agencies", "Consultants", "MSMEs", "Studios", "IT services", "Finance teams"].map((name) => (
+          <div key={name} className="hover-lift rounded-md border border-slate-200 bg-slate-50 px-4 py-3 text-center text-sm font-semibold text-slate-700">
             {name}
           </div>
         ))}
@@ -139,12 +150,15 @@ function Workflow() {
 
 function FeatureGrid({ features }: { features: MarketingContent["features"] }) {
   return (
-    <section className="brand-grid border-y border-slate-200 bg-[#fff9ef] px-4 py-20 sm:px-6 lg:px-8">
+    <section className="brand-grid border-y border-slate-200 bg-slate-50 px-4 py-20 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         <SectionLabel label="Features" title="Everything needed to move from draft to signed deal." />
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {features.map((card) => (
+          {features.map((card, index) => (
             <Link key={card.title} href="/features" className="hover-lift relative rounded-lg border border-slate-200 bg-white p-6">
+              <span className="mb-5 grid h-10 w-10 place-items-center rounded-md bg-teal-50 text-sm font-bold text-teal-700">
+                {String(index + 1).padStart(2, "0")}
+              </span>
               <h3 className="text-lg font-semibold">{card.title}</h3>
               <p className="mt-3 text-sm leading-6 text-slate-600">{card.copy}</p>
             </Link>
@@ -195,12 +209,12 @@ function DemoPreview({ templates }: { templates: MarketingContent["templates"] }
 
 function PricingTeaser({ plans }: { plans: MarketingContent["plans"] }) {
   return (
-    <section className="brand-grid border-y border-slate-200 bg-[#fbfaf6] px-4 py-20 sm:px-6 lg:px-8">
+    <section className="brand-grid border-y border-slate-200 bg-white px-4 py-20 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         <SectionLabel label="Pricing" title="Plans shaped like modern proposal software." />
         <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
           {plans.map((plan) => (
-            <div key={plan.name} className="hover-lift relative rounded-lg border border-slate-200 bg-white p-6">
+            <div key={plan.name} className={`hover-lift relative rounded-lg border bg-white p-6 ${plan.popular ? "border-teal-300 shadow-xl shadow-teal-900/10" : "border-slate-200"}`}>
               {plan.popular ? <span className="rounded-md bg-teal-100 px-3 py-1 text-xs font-semibold text-teal-800">Most popular</span> : null}
               <h3 className="mt-4 text-xl font-semibold">{plan.name}</h3>
               <p className="mt-4 text-3xl font-semibold">{plan.annualPrice}<span className="text-base text-slate-500">{plan.cadence}</span></p>

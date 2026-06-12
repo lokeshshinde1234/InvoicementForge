@@ -44,7 +44,7 @@ export class PortalMailService {
     companyName: string;
     clientName: string;
     expiresInMinutes: number;
-  }): Promise<{ delivered: boolean; mode: 'smtp' | 'log' }> {
+  }): Promise<{ delivered: boolean; mode: 'smtp' | 'resend' | 'log' }> {
     const safeCompanyName = this.escapeHtml(companyName);
     const safeClientName = this.escapeHtml(clientName);
     const settings = this.readEmailSettings(
@@ -76,7 +76,7 @@ export class PortalMailService {
       `,
     });
 
-    return { delivered: true, mode: 'smtp' };
+    return { delivered: true, mode: settings.provider };
   }
 
   async sendPasswordResetLink({
@@ -95,7 +95,7 @@ export class PortalMailService {
     expiresInMinutes: number;
     logoUrl?: string | null;
     logoAltText?: string | null;
-  }): Promise<{ delivered: boolean; mode: 'smtp' | 'log' }> {
+  }): Promise<{ delivered: boolean; mode: 'smtp' | 'resend' | 'log' }> {
     const safeAccountName = this.escapeHtml(accountName);
     const safeResetUrl = this.escapeHtml(resetUrl);
     const logo = this.resolveEmailLogo(logoUrl);
@@ -146,7 +146,7 @@ export class PortalMailService {
       `,
     });
 
-    return { delivered: true, mode: 'smtp' };
+    return { delivered: true, mode: settings.provider };
   }
 
   async sendInvoiceNotification({
@@ -167,7 +167,7 @@ export class PortalMailService {
     currency: string;
     dueDate: string | Date;
     portalUrl: string;
-  }): Promise<{ delivered: boolean; mode: 'smtp' | 'log' }> {
+  }): Promise<{ delivered: boolean; mode: 'smtp' | 'resend' | 'log' }> {
     const safeClientName = this.escapeHtml(clientName);
     const safeCompanyName = this.escapeHtml(companyName);
     const safeInvoiceNumber = this.escapeHtml(invoiceNumber);
@@ -212,7 +212,7 @@ export class PortalMailService {
       `,
     });
 
-    return { delivered: true, mode: 'smtp' };
+    return { delivered: true, mode: settings.provider };
   }
 
   private formatDate(value: string | Date): string {

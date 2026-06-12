@@ -23,7 +23,7 @@ export default function ForgotPasswordPage() {
       );
       setMessage(
         response.data.delivery?.mode === "log"
-          ? "Reset link created. SMTP is not configured, so check backend logs for local testing."
+          ? "Reset link created. Email delivery is not configured, so check backend logs for local testing."
           : response.data.message,
       );
     } catch (requestError) {

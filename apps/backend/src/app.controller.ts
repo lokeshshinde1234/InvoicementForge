@@ -18,4 +18,59 @@ export class AppController {
       timestamp: new Date().toISOString(),
     };
   }
+
+  @Get('health/email')
+  emailHealth(): {
+    status: 'ready' | 'missing';
+    provider: 'resend' | 'smtp' | 'none';
+    fromConfigured: boolean;
+    hostConfigured: boolean;
+    urlConfigured: boolean;
+    resendConfigured: boolean;
+    required: string[];
+  } {
+    const fromConfigured = Boolean(
+      process.env.SMTP_FROM ||
+        process.env.MAIL_FROM ||
+        process.env.EMAIL_FROM ||
+        process.env.MAIL_FROM_ADDRESS ||
+        process.env.SENDER_EMAIL ||
+        process.env.RESEND_FROM,
+    );
+    const hostConfigured = Boolean(
+      process.env.SMTP_HOST ||
+        process.env.MAIL_HOST ||
+        process.env.EMAIL_HOST ||
+        process.env.EMAIL_SERVER_HOST,
+    );
+    const urlConfigured = Boolean(
+      process.env.SMTP_URL ||
+        process.env.MAIL_URL ||
+        process.env.EMAIL_SERVER ||
+        process.env.EMAIL_SERVER_URL,
+    );
+    const resendConfigured = Boolean(process.env.RESEND_API_KEY);
+    const provider =
+      resendConfigured && fromConfigured
+        ? 'resend'
+        : fromConfigured && (hostConfigured || urlConfigured)
+          ? 'smtp'
+          : 'none';
+
+    return {
+      status: provider === 'none' ? 'missing' : 'ready',
+      provider,
+      fromConfigured,
+      hostConfigured,
+      urlConfigured,
+      resendConfigured,
+      required:
+        provider === 'none'
+          ? [
+              'RESEND_API_KEY + RESEND_FROM',
+              'or SMTP_HOST/SMTP_URL + SMTP_FROM',
+            ]
+          : [],
+    };
+  }
 }
