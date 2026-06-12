@@ -413,9 +413,7 @@ export class PortalMailService {
       this.logger.error(
         `SMTP delivery failed for ${String(mail.to)} [${code}]: ${message}`,
       );
-      throw new ServiceUnavailableException(
-        'Email could not be delivered right now. Please verify SMTP settings and try again.',
-      );
+      throw new ServiceUnavailableException(this.smtpFailureMessage(code));
     } finally {
       transporter.close();
     }
@@ -466,7 +464,7 @@ export class PortalMailService {
   }
 
   private createEnvelope(settings: SmtpSettings, mail: SendMailOptions) {
-    const from = this.extractEmailAddress(settings.from) ?? settings.user;
+    const from = settings.user ?? this.extractEmailAddress(settings.from);
     const to = this.normalizeEnvelopeRecipients(mail.to);
 
     if (!from || to.length === 0) return undefined;
@@ -492,6 +490,18 @@ export class PortalMailService {
   private extractEmailAddress(value?: string): string | undefined {
     const match = value?.match(/<([^>]+)>/);
     return (match?.[1] ?? value)?.trim() || undefined;
+  }
+
+  private smtpFailureMessage(code: string): string {
+    if (['EAUTH', 'EENVELOPE'].includes(code)) {
+      return 'Email could not be delivered because SMTP login or sender settings were rejected. Please verify SMTP_USER, SMTP_PASS, and SMTP_FROM.';
+    }
+
+    if (['ECONNECTION', 'ETIMEDOUT', 'ESOCKET'].includes(code)) {
+      return 'Email could not be delivered because the SMTP server connection failed. Please verify SMTP_HOST, SMTP_PORT, and SMTP_SECURE.';
+    }
+
+    return 'Email could not be delivered right now. Please verify SMTP settings and try again.';
   }
 
   private readBoolean(value?: string): boolean | undefined {
