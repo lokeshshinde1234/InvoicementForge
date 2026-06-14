@@ -291,6 +291,13 @@ export function AuthForm({ mode }: { mode: Mode }) {
                       </button>
                     </div>
                   </AuthField>
+                  {!isSignup ? (
+                    <div className="-mt-2 flex justify-end">
+                      <Link href="/forgot-password" className="text-xs font-bold text-teal-700 transition hover:text-teal-900 sm:text-sm">
+                        Forgot password?
+                      </Link>
+                    </div>
+                  ) : null}
                 </div>
 
                 {error ? <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-medium text-red-700">{error}</p> : null}
@@ -304,10 +311,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
                   {isSignup ? (
                     <p>Already have an account? <Link href={loginHref} className="font-bold text-teal-700">Log in</Link></p>
                   ) : (
-                    <>
-                      <Link href="/forgot-password" className="font-bold text-teal-700">Forgot password?</Link>
-                      <p>New to InvoiceForge? <Link href={signupHref} className="font-bold text-teal-700">Create account</Link></p>
-                    </>
+                    <p>New to InvoiceForge? <Link href={signupHref} className="font-bold text-teal-700">Create account</Link></p>
                   )}
                 </div>
                 {!isSignup ? (

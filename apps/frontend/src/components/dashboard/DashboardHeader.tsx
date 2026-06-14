@@ -44,7 +44,7 @@ export function DashboardHeader({
               </div>
             </div>
 
-            <div className="grid w-full gap-3 sm:w-auto sm:grid-cols-2">
+            <div className="grid w-full grid-cols-2 gap-2 sm:w-auto sm:gap-3">
               <Link
                 href="/invoices/new"
                 className="inline-flex h-10 items-center justify-center rounded-md bg-teal-600 px-4 text-sm font-semibold text-white transition hover:bg-teal-700"
@@ -60,11 +60,11 @@ export function DashboardHeader({
             </div>
           </div>
 
-          <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="mt-5 grid grid-cols-2 gap-2 sm:mt-6 sm:gap-3 xl:grid-cols-4">
             {quickSummary.map((item) => (
               <div
                 key={item.label}
-                className="rounded-2xl border border-white/80 bg-white/80 px-4 py-4 shadow-sm backdrop-blur"
+                className="min-w-0 rounded-2xl border border-white/80 bg-white/80 px-3 py-3 shadow-sm backdrop-blur sm:px-4 sm:py-4"
               >
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
                   {item.label}

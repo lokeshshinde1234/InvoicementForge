@@ -116,19 +116,19 @@ export default function ClientPortalLoginPage() {
           <p className="relative text-xs text-teal-100/60">Only documents connected to your client record are visible.</p>
         </aside>
 
-        <section className="flex items-center justify-center px-4 py-6 sm:px-8 sm:py-10 lg:px-12">
+        <section className="flex min-w-0 items-center justify-center px-3 py-4 sm:px-8 sm:py-10 lg:px-12">
           <div className="w-full max-w-md">
-            <div className="mb-5 flex items-center justify-between lg:hidden">
+            <div className="mb-4 flex min-w-0 items-center justify-between gap-2 lg:hidden">
               <Link href="/" className="inline-flex items-center gap-3">
-                <span className="grid h-10 w-10 place-items-center rounded-xl bg-teal-950 text-sm font-black text-white">IF</span>
-                <span className="font-bold">InvoiceForge</span>
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-teal-950 text-xs font-black text-white">IF</span>
+                <span className="truncate text-sm font-bold">InvoiceForge</span>
               </Link>
-              <Link href="/login" className="rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 shadow-sm">
+              <Link href="/login" className="shrink-0 rounded-full border border-slate-200 bg-white px-3 py-2 text-[11px] font-bold text-slate-700 shadow-sm">
                 Company login
               </Link>
             </div>
 
-            <div className="rounded-[24px] border border-white/80 bg-white p-5 shadow-2xl shadow-teal-950/10 sm:p-8">
+            <div className="rounded-[22px] border border-white/80 bg-white p-4 shadow-2xl shadow-teal-950/10 sm:p-8">
               <div className="flex items-center gap-3">
                 <span className="grid h-11 w-11 place-items-center rounded-xl bg-teal-50 text-sm font-black text-teal-800 ring-1 ring-teal-100">CP</span>
                 <div>
@@ -136,7 +136,7 @@ export default function ClientPortalLoginPage() {
                   <p className="mt-0.5 text-xs text-slate-500">Private document access</p>
                 </div>
               </div>
-              <h1 className="mt-6 text-2xl font-bold tracking-tight sm:text-3xl">
+              <h1 className="mt-5 text-2xl font-bold tracking-tight sm:mt-6 sm:text-3xl">
                 {setupMode ? "Create your secure password" : "Welcome to your client portal"}
               </h1>
               <p className="mt-2 text-sm leading-6 text-slate-600">
@@ -145,13 +145,13 @@ export default function ClientPortalLoginPage() {
                   : "Use the email address registered by the company that invited you."}
               </p>
 
-              <form onSubmit={submit} className="mt-6 grid gap-4">
+              <form onSubmit={submit} className="mt-5 grid gap-3.5 sm:mt-6 sm:gap-4">
           <Field label="Company ID">
             <input
               value={companyId}
               onChange={(event) => setCompanyId(event.target.value)}
               placeholder="Only needed if you use multiple companies"
-              className="h-12 rounded-xl border border-slate-300 px-3 text-sm outline-none transition focus:border-teal-600 focus:ring-4 focus:ring-teal-100"
+              className="h-11 w-full rounded-xl border border-slate-300 px-3 text-sm outline-none transition focus:border-teal-600 focus:ring-4 focus:ring-teal-100 sm:h-12"
             />
           </Field>
           <Field label="Email address">
@@ -162,7 +162,7 @@ export default function ClientPortalLoginPage() {
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               placeholder="client@company.com"
-              className="h-12 rounded-xl border border-slate-300 px-3 text-sm outline-none transition focus:border-teal-600 focus:ring-4 focus:ring-teal-100"
+              className="h-11 w-full rounded-xl border border-slate-300 px-3 text-sm outline-none transition focus:border-teal-600 focus:ring-4 focus:ring-teal-100 sm:h-12"
             />
           </Field>
           <Field label={setupMode ? "New password" : "Password"}>
@@ -213,13 +213,13 @@ export default function ClientPortalLoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="h-12 rounded-xl bg-teal-700 text-sm font-bold text-white shadow-lg shadow-teal-900/15 transition hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-60"
+            className="h-11 rounded-xl bg-teal-700 text-sm font-bold text-white shadow-lg shadow-teal-900/15 transition hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-60 sm:h-12"
           >
             {loading ? "Please wait..." : setupMode ? "Create password and continue" : "Sign in securely"}
           </button>
         </form>
 
-              <div className="mt-6 flex flex-col gap-3 border-t border-slate-100 pt-5 text-sm sm:flex-row sm:items-center sm:justify-between">
+              <div className="mt-5 flex items-center justify-between gap-3 border-t border-slate-100 pt-4 text-xs sm:mt-6 sm:pt-5 sm:text-sm">
                 <Link href="/portal/forgot-password" className="font-bold text-teal-700">Forgot password?</Link>
                 <Link href="/login" className="font-semibold text-slate-500 hover:text-slate-900">Company team login</Link>
               </div>
@@ -263,7 +263,7 @@ function PasswordInput({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder="Enter password"
-        className="h-12 min-w-0 flex-1 px-3 text-sm outline-none"
+        className="h-11 min-w-0 flex-1 px-3 text-sm outline-none sm:h-12"
       />
       <button
         type="button"

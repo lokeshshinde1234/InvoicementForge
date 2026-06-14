@@ -343,7 +343,7 @@ export default function ClientPortalDashboardPage() {
               </p>
             </div>
           </div>
-          <div className="mt-3 grid w-full grid-cols-[44px_1fr_1fr] gap-2 sm:ml-auto sm:mt-0 sm:flex sm:w-auto sm:items-center sm:justify-end">
+          <div className="mt-3 grid w-full grid-cols-[40px_minmax(0,1fr)_40px] gap-2 sm:ml-auto sm:mt-0 sm:flex sm:w-auto sm:items-center sm:justify-end">
             <details
               className="relative"
               onToggle={(event) => {
@@ -382,19 +382,23 @@ export default function ClientPortalDashboardPage() {
               href="/portal/change-password"
               className="inline-flex h-10 min-w-0 items-center justify-center rounded-xl border border-slate-200 bg-white px-2 text-xs font-bold text-slate-800 transition hover:-translate-y-0.5 hover:border-teal-500 hover:shadow-md sm:px-4 sm:text-sm"
             >
-              Password settings
+              <span className="sm:hidden">Security settings</span>
+              <span className="hidden sm:inline">Password settings</span>
             </Link>
             <button
               type="button"
               onClick={logout}
-              className="h-10 rounded-xl border border-slate-200 bg-white px-2 text-xs font-bold text-slate-800 transition hover:-translate-y-0.5 hover:border-slate-950 hover:shadow-md sm:px-4 sm:text-sm"
+              aria-label="Log out"
+              title="Log out"
+              className="grid h-10 w-10 place-items-center rounded-xl border border-slate-200 bg-white text-slate-800 transition hover:-translate-y-0.5 hover:border-slate-950 hover:shadow-md sm:flex sm:w-auto sm:px-4 sm:text-sm sm:font-bold"
             >
-              Logout
+              <span className="text-lg sm:hidden" aria-hidden="true">↗</span>
+              <span className="hidden sm:inline">Logout</span>
             </button>
           </div>
         </header>
 
-        <section className="mt-4 grid grid-cols-2 gap-3 sm:mt-6 md:grid-cols-4 md:gap-4">
+        <section className="mt-4 grid grid-cols-2 gap-2 sm:mt-6 sm:gap-3 md:grid-cols-4 md:gap-4">
           <InfoCard label="Client email" value={data.client.email ?? "Not added"} />
           <InfoCard label="Documents" value={String(documentCount)} />
           <InfoCard label="Open balance" value={formatMoney(openInvoiceTotal)} />
@@ -414,7 +418,7 @@ export default function ClientPortalDashboardPage() {
                 This workspace is scoped to your verified client account with {data.company.name}. It refreshes automatically so new notifications and payment records stay current.
               </p>
             </div>
-            <div className="grid grid-cols-2 gap-3 sm:w-80">
+            <div className="grid grid-cols-2 gap-2 sm:w-80 sm:gap-3">
               <MiniStat label="Proposals" value={String(data.documents.proposals.length)} />
               <MiniStat label="Invoices" value={String(data.documents.invoices.length)} />
             </div>
@@ -596,7 +600,7 @@ function NotificationPanel({
   onRead: (notification: PortalMe["notifications"][number]) => void;
 }) {
   return (
-    <section className="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-xl shadow-slate-950/10 backdrop-blur">
+    <section className="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-xl shadow-slate-950/10 backdrop-blur sm:rounded-3xl sm:p-5">
       <div className="flex items-center justify-between gap-3 border-b border-slate-200 pb-4">
         <div>
           <h2 className="text-lg font-black tracking-tight">Notifications</h2>
@@ -860,7 +864,7 @@ function DocumentRow({
   return (
     <Link
       href={href}
-      className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-3 shadow-sm transition hover:-translate-y-0.5 hover:border-teal-200 hover:shadow-md sm:flex sm:justify-between sm:gap-4 sm:px-4"
+      className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-3 shadow-sm transition hover:-translate-y-0.5 hover:border-teal-200 hover:shadow-md sm:flex sm:justify-between sm:gap-4 sm:px-4"
     >
       <div className="min-w-0">
         <p className="break-words text-sm font-semibold">{title}</p>

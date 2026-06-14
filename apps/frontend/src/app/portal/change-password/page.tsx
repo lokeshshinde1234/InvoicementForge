@@ -108,13 +108,13 @@ export default function ClientPasswordSettingsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f5f7fb] px-4 py-10 text-slate-950">
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(20,184,166,0.14),transparent_35%),#f5f7fb] px-3 py-5 text-slate-950 sm:px-4 sm:py-10">
       <section className="mx-auto w-full max-w-5xl">
         <Link href="/portal/dashboard" className="text-sm font-semibold text-teal-700">
           Back to dashboard
         </Link>
 
-        <div className="mt-6 rounded-lg border border-slate-200 bg-white p-6 shadow-xl shadow-slate-900/5">
+        <div className="mt-4 rounded-2xl border border-white bg-white p-5 shadow-xl shadow-teal-950/10 sm:mt-6 sm:p-6">
           <p className="text-sm font-semibold uppercase tracking-wide text-teal-700">
             Client password
           </p>
@@ -128,7 +128,7 @@ export default function ClientPasswordSettingsPage() {
         </div>
 
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
-          <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+          <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
             <h2 className="text-lg font-semibold tracking-tight">
               Change with current password
             </h2>
@@ -175,7 +175,7 @@ export default function ClientPasswordSettingsPage() {
             </form>
           </section>
 
-          <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+          <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
             <h2 className="text-lg font-semibold tracking-tight">
               Forgot current password?
             </h2>
@@ -194,7 +194,7 @@ export default function ClientPasswordSettingsPage() {
                   value={resetEmail}
                   onChange={(event) => setResetEmail(event.target.value)}
                   placeholder="client@company.com"
-                  className="h-11 rounded-md border border-slate-200 px-3 text-sm outline-none focus:border-teal-500"
+                  className="h-11 w-full rounded-xl border border-slate-300 px-3 text-sm outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100"
                 />
               </label>
               <label className="grid gap-2 text-sm font-semibold text-slate-700">
@@ -203,7 +203,7 @@ export default function ClientPasswordSettingsPage() {
                   value={companyId}
                   onChange={(event) => setCompanyId(event.target.value)}
                   placeholder="Company ID"
-                  className="h-11 rounded-md border border-slate-200 px-3 text-sm outline-none focus:border-teal-500"
+                  className="h-11 w-full rounded-xl border border-slate-300 px-3 text-sm outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100"
                 />
               </label>
               <button
@@ -251,7 +251,7 @@ function PasswordField({
       autoComplete={autoComplete}
       onChange={(event) => onChange(event.target.value)}
       placeholder={placeholder}
-      className="h-11 rounded-md border border-slate-200 px-3 text-sm outline-none focus:border-teal-500"
+      className="h-11 w-full rounded-xl border border-slate-300 px-3 text-sm outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100"
     />
   );
 }

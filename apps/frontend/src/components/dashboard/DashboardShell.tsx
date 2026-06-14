@@ -129,7 +129,7 @@ export function DashboardShell({
   }
 
   return (
-    <main className="min-h-screen bg-[#f5f7fb] text-slate-950">
+    <main className="company-mobile min-h-screen bg-[#f5f7fb] text-slate-950">
       <div className="grid min-h-screen lg:grid-cols-[248px_1fr]">
         <aside className="hidden border-r border-slate-200 bg-[#07111f] text-white lg:sticky lg:top-0 lg:flex lg:h-screen lg:self-start lg:flex-col">
           <div className="flex h-16 shrink-0 items-center gap-3 border-b border-white/10 px-5">

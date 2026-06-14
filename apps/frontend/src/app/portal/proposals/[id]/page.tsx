@@ -400,7 +400,7 @@ export default function ClientProposalReviewPage({ params }: PageParams) {
         </div>
 
         <header className="mt-4 overflow-hidden rounded-lg border border-white/80 bg-white shadow-2xl shadow-slate-950/10">
-          <div className="bg-slate-950 px-6 py-5 text-white">
+          <div className="bg-slate-950 px-4 py-5 text-white sm:px-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="text-sm font-bold uppercase tracking-wide text-teal-200">
                 Proposal review
@@ -409,8 +409,8 @@ export default function ClientProposalReviewPage({ params }: PageParams) {
             </div>
           </div>
           <div className="mt-3 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div className="px-6 pb-6">
-              <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+            <div className="px-4 pb-5 sm:px-6 sm:pb-6">
+              <h1 className="break-words text-2xl font-semibold tracking-tight sm:text-4xl">
                 {proposal.title}
               </h1>
               <p className="mt-3 text-sm leading-6 text-slate-600">
