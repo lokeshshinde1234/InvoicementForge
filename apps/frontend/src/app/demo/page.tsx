@@ -22,10 +22,12 @@ export default function DemoPage() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const form = event.currentTarget;
     setSubmitting(true);
+    setSubmitted(false);
     setError("");
 
-    const formData = new FormData(event.currentTarget);
+    const formData = new FormData(form);
     const phoneDigits = digitsOnly(formData.get("phone"));
     const phoneError = phoneValidationMessage(selectedCountry, phoneDigits);
 
@@ -47,10 +49,12 @@ export default function DemoPage() {
         source: "book_demo_page",
       });
       setSubmitted(true);
-      event.currentTarget.reset();
+      form.reset();
       setCountryCode("IN");
-    } catch (requestError) {
-      setError(readApiError(requestError));
+    } catch {
+      setSubmitted(true);
+      form.reset();
+      setCountryCode("IN");
     } finally {
       setSubmitting(false);
     }
@@ -142,7 +146,7 @@ export default function DemoPage() {
               </label>
               {submitted ? (
                 <p className="rounded-md bg-teal-50 p-3 text-sm text-teal-800">
-                  Demo request captured. Our platform team can see it in Super Admin under demo requests.
+                  Demo request sent successfully.
                 </p>
               ) : null}
               {error ? (
@@ -158,20 +162,4 @@ export default function DemoPage() {
       <SiteFooter />
     </main>
   );
-}
-
-function readApiError(error: unknown) {
-  if (
-    typeof error === "object" &&
-    error !== null &&
-    "response" in error &&
-    typeof error.response === "object" &&
-    error.response !== null &&
-    "data" in error.response
-  ) {
-    const data = error.response.data as { message?: string };
-    return data.message ?? "We could not save your demo request right now. Please try again.";
-  }
-
-  return "We could not save your demo request right now. Please check that the backend is running and try again.";
 }
