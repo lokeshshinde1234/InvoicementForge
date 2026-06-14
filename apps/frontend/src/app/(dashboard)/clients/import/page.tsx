@@ -242,8 +242,8 @@ function ClientsImportContent() {
                         {importMutation.isPending ? "Saving..." : "Save contacts"}
                       </Button>
                     </div>
-                    <div className="max-h-[420px] overflow-auto">
-                      <table className="w-full min-w-[680px] text-left text-sm">
+                    <div className="mobile-table-scroll max-h-[420px] overflow-auto">
+                      <table className="mobile-card-table w-full min-w-[680px] text-left text-sm">
                         <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                           <tr>
                             <th className="px-4 py-3 font-semibold">Name</th>
@@ -265,7 +265,7 @@ function ClientsImportContent() {
                                 key={`${typed.name ?? "row"}-${index}`}
                                 className={!typed._hasName ? "bg-rose-50/60" : "hover:bg-slate-50"}
                               >
-                                <td className="px-4 py-3">
+                                <td data-label="Name" className="px-4 py-3">
                                   <div className="font-medium text-slate-900">
                                     {typed.name || "Missing name"}
                                   </div>
@@ -275,16 +275,16 @@ function ClientsImportContent() {
                                     </div>
                                   ) : null}
                                 </td>
-                                <td className="px-4 py-3 text-slate-600">
+                                <td data-label="Company" className="px-4 py-3 text-slate-600">
                                   {typed.companyName || "-"}
                                 </td>
-                                <td className={`px-4 py-3 ${typed._validEmail === false ? "text-rose-700" : "text-slate-600"}`}>
+                                <td data-label="Email" className={`px-4 py-3 ${typed._validEmail === false ? "text-rose-700" : "text-slate-600"}`}>
                                   {typed.email || "-"}
                                 </td>
-                                <td className={`px-4 py-3 ${typed._validPhone === false ? "text-rose-700" : "text-slate-600"}`}>
+                                <td data-label="Phone" className={`px-4 py-3 ${typed._validPhone === false ? "text-rose-700" : "text-slate-600"}`}>
                                   {typed.phone || "-"}
                                 </td>
-                                <td className="px-4 py-3 text-slate-600">
+                                <td data-label="State" className="px-4 py-3 text-slate-600">
                                   {typed.state || "-"}
                                 </td>
                               </tr>

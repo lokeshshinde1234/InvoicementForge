@@ -529,8 +529,8 @@ function CompanyKhataLedger({
             description="Use the activity buttons to add credit sales, payment collections, or reminders."
           />
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[760px] text-left text-sm">
+          <div className="mobile-table-scroll overflow-x-auto">
+            <table className="mobile-card-table w-full min-w-[760px] text-left text-sm">
               <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-[0.16em] text-slate-500">
                 <tr>
                   <th className="px-3 py-3">Activity</th>
@@ -550,12 +550,12 @@ function CompanyKhataLedger({
 
                   return (
                     <tr key={entry.id} className="hover:bg-teal-50/40">
-                      <td className="px-3 py-4">
+                      <td data-label="Activity" className="px-3 py-4">
                         <span className={`rounded-full px-2.5 py-1 text-xs font-black ${khataTone(entry.type)}`}>
                           {formatKhataType(entry.type)}
                         </span>
                       </td>
-                      <td className="px-3 py-4">
+                      <td data-label="Customer" className="px-3 py-4">
                         <p className="font-bold text-slate-900">
                           {client?.companyName || client?.name || fallbackName || "Walk-in customer"}
                         </p>
@@ -563,17 +563,17 @@ function CompanyKhataLedger({
                           {client?.email || fallbackPhone || entry.clientId || "No client linked"}
                         </p>
                       </td>
-                      <td className="px-3 py-4 text-right font-black">
+                      <td data-label="Amount" className="px-3 py-4 text-right font-black">
                         {formatMoney(entry.amount)}
                       </td>
-                      <td className="px-3 py-4 text-right font-black">
+                      <td data-label="Outstanding" className="px-3 py-4 text-right font-black">
                         {formatMoney(entry.outstandingAmount)}
                       </td>
-                      <td className="px-3 py-4">{formatDate(entry.dueDate ?? entry.createdAt)}</td>
-                      <td className="max-w-xs px-3 py-4 text-slate-600">
+                      <td data-label="Due date" className="px-3 py-4">{formatDate(entry.dueDate ?? entry.createdAt)}</td>
+                      <td data-label="Notes" className="max-w-xs px-3 py-4 text-slate-600">
                         {entry.notes || "-"}
                       </td>
-                      <td className="px-3 py-4 text-right">
+                      <td data-label="Actions" className="px-3 py-4 text-right">
                         <DeleteKhataButton
                           deleting={deletingEntryId === entry.id}
                           onClick={() => onDelete(entry)}

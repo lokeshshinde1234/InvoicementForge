@@ -224,8 +224,8 @@ function InvoiceDetail({ id }: { id: string }) {
               <CardTitle>Line items</CardTitle>
               <CardDescription>GST-ready invoice breakdown.</CardDescription>
             </CardHeader>
-            <CardContent className="overflow-x-auto">
-              <table className="w-full min-w-[640px] text-left text-sm">
+            <CardContent className="mobile-table-scroll overflow-x-auto">
+              <table className="mobile-card-table w-full min-w-[640px] text-left text-sm">
                 <thead className="border-b border-slate-200 text-slate-500">
                   <tr>
                     <th className="py-3 font-medium">Description</th>
@@ -238,13 +238,13 @@ function InvoiceDetail({ id }: { id: string }) {
                 <tbody className="divide-y divide-slate-100">
                   {invoice.lineItems.map((item, index) => (
                     <tr key={`${item.description}-${index}`}>
-                      <td className="py-4 font-medium">{item.description}</td>
-                      <td className="py-4">{item.quantity}</td>
-                      <td className="py-4">
+                      <td data-label="Description" className="py-4 font-medium">{item.description}</td>
+                      <td data-label="Qty" className="py-4">{item.quantity}</td>
+                      <td data-label="Rate" className="py-4">
                         {formatCurrency(Number(item.unitPrice))}
                       </td>
-                      <td className="py-4">{item.gstRate}%</td>
-                      <td className="py-4 text-right font-semibold">
+                      <td data-label="GST" className="py-4">{item.gstRate}%</td>
+                      <td data-label="Total" className="py-4 text-right font-semibold">
                         {formatCurrency(Number(item.total ?? 0))}
                       </td>
                     </tr>

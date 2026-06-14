@@ -496,8 +496,8 @@ function TaxRecords({
           />
         </div>
       ) : (
-        <div className="max-w-full overflow-x-auto">
-          <table className="w-full min-w-[880px] text-left text-sm">
+        <div className="mobile-table-scroll max-w-full overflow-x-auto">
+          <table className="mobile-card-table w-full min-w-[880px] text-left text-sm">
             <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
               <tr>
                 <th className="px-5 py-3">Invoice</th>
@@ -512,7 +512,7 @@ function TaxRecords({
             <tbody className="divide-y divide-slate-100">
               {rows.map(({ invoice, item, index }) => (
                 <tr key={`${invoice.id}-${index}`} className="hover:bg-slate-50">
-                  <td className="px-5 py-4">
+                  <td data-label="Invoice" className="px-5 py-4">
                     <Link
                       href={`/invoices/${invoice.id}`}
                       className="font-semibold text-slate-950 hover:text-teal-700"
@@ -521,18 +521,18 @@ function TaxRecords({
                     </Link>
                     <p className="mt-1 text-xs text-slate-500">{invoice.status}</p>
                   </td>
-                  <td className="px-5 py-4">{item.description || "Untitled item"}</td>
-                  <td className="px-5 py-4">
+                  <td data-label="Item" className="px-5 py-4">{item.description || "Untitled item"}</td>
+                  <td data-label="HSN/SAC" className="px-5 py-4">
                     HSN {item.hsnCode || "-"} / SAC {item.sacCode || "-"}
                   </td>
-                  <td className="px-5 py-4">{item.gstRate ?? 0}%</td>
-                  <td className="px-5 py-4">
+                  <td data-label="GST" className="px-5 py-4">{item.gstRate ?? 0}%</td>
+                  <td data-label="TDS/TCS" className="px-5 py-4">
                     TDS {item.tdsRate ?? 0}% / TCS {item.tcsRate ?? 0}%
                   </td>
-                  <td className="px-5 py-4 text-right font-semibold">
+                  <td data-label="Amount" className="px-5 py-4 text-right font-semibold">
                     {formatCurrency(Number(item.total ?? invoice.total))}
                   </td>
-                  <td className="px-5 py-4">
+                  <td data-label="Actions" className="px-5 py-4">
                     <div className="flex justify-end gap-2">
                       <Link
                         href={`/invoices/${invoice.id}`}
@@ -799,8 +799,8 @@ function ReportTable({
       {rows.length === 0 ? (
         <p className="px-4 py-5 text-sm text-slate-500">{empty}</p>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[760px] text-left text-xs">
+        <div className="mobile-table-scroll overflow-x-auto">
+          <table className="mobile-card-table w-full min-w-[760px] text-left text-xs">
             <thead className="bg-slate-50 uppercase tracking-wide text-slate-500">
               <tr>
                 {columns.map((column) => (
@@ -814,7 +814,7 @@ function ReportTable({
               {rows.map((row, rowIndex) => (
                 <tr key={`${title}-${rowIndex}`} className="hover:bg-slate-50">
                   {row.map((cell, cellIndex) => (
-                    <td key={`${title}-${rowIndex}-${cellIndex}`} className="px-3 py-2">
+                    <td data-label={columns[cellIndex]} key={`${title}-${rowIndex}-${cellIndex}`} className="px-3 py-2">
                       {cell}
                     </td>
                   ))}

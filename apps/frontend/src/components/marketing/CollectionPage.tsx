@@ -26,7 +26,7 @@ export function CollectionPage({
 }: CollectionPageProps) {
   return (
     <SimpleMarketingPage label={label} title={title} copy={copy}>
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+      <section className="mobile-section mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {cards.map((card) => {
             const content = (
@@ -47,14 +47,14 @@ export function CollectionPage({
               <Link
                 key={card.title}
                 href={card.href}
-                className="hover-lift rounded-lg border border-slate-200 bg-white p-6 shadow-sm"
+                className="mobile-card hover-lift rounded-lg border border-slate-200 bg-white p-6 shadow-sm"
               >
                 {content}
               </Link>
             ) : (
               <article
                 key={card.title}
-                className="hover-lift rounded-lg border border-slate-200 bg-white p-6 shadow-sm"
+                className="mobile-card hover-lift rounded-lg border border-slate-200 bg-white p-6 shadow-sm"
               >
                 {content}
               </article>
@@ -62,7 +62,7 @@ export function CollectionPage({
           })}
         </div>
 
-        <div className="mt-12 rounded-lg border border-slate-200 bg-slate-950 p-8 text-white">
+        <div className="mobile-card mt-8 rounded-2xl border border-slate-200 bg-slate-950 p-8 text-white sm:mt-12">
           <p className="text-sm font-semibold uppercase tracking-wide text-teal-200">
             InvoiceForge workflow
           </p>

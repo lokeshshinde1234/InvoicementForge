@@ -758,21 +758,28 @@ function Sidebar({ active }: { active: string }) {
 
 function MobileAdminNav({ active }: { active: string }) {
   return (
-    <nav className="mobile-table-scroll flex gap-2 overflow-x-auto border-t border-slate-100 px-3 py-2.5 xl:hidden">
-      {sidebarItems.map(([label, href]) => (
-        <Link
-          key={href}
-          href={href}
-          className={`shrink-0 rounded-lg px-3 py-2 text-xs font-bold ${
-            href === active
-              ? "bg-slate-950 text-white"
-              : "bg-slate-100 text-slate-700"
-          }`}
-        >
-          {label}
-        </Link>
-      ))}
-    </nav>
+    <details className="group border-t border-slate-100 px-3 py-2.5 xl:hidden">
+      <summary className="flex cursor-pointer list-none items-center justify-between rounded-xl bg-slate-950 px-4 py-3 text-sm font-bold text-white">
+        <span>Admin navigation</span>
+        <span className="text-xs text-cyan-200 group-open:hidden">Open menu</span>
+        <span className="hidden text-xs text-cyan-200 group-open:inline">Close menu</span>
+      </summary>
+      <nav className="mt-2 grid grid-cols-2 gap-2 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
+        {sidebarItems.map(([label, href]) => (
+          <Link
+            key={href}
+            href={href}
+            className={`rounded-xl border px-3 py-3 text-xs font-bold ${
+              href === active
+                ? "border-cyan-200 bg-cyan-50 text-cyan-900"
+                : "border-slate-200 bg-white text-slate-700"
+            }`}
+          >
+            {label}
+          </Link>
+        ))}
+      </nav>
+    </details>
   );
 }
 
@@ -861,7 +868,7 @@ function DemoRequestActions({
   ];
 
   return (
-    <div className="min-w-[360px] space-y-2">
+    <div className="min-w-0 space-y-2 sm:min-w-[360px]">
       <div className="flex flex-wrap gap-2">
         <a
           href={`mailto:${email}?subject=${encodeURIComponent("InvoiceForge demo request")}`}
@@ -930,7 +937,7 @@ function DeleteRecordAction({
   const disabled = !id || Boolean(deletingId) || Boolean(blockedReason);
 
   return (
-    <div className="flex min-w-[112px] justify-end">
+    <div className="flex min-w-0 justify-start sm:min-w-[112px] sm:justify-end">
       <button
         type="button"
         onClick={() => onDelete(record)}

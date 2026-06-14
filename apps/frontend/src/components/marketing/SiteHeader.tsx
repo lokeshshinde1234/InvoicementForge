@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { AUTH_CHANGED_EVENT, getAuthToken } from "@/lib/auth-storage";
 import { navItems } from "./site-data";
 
@@ -25,6 +26,7 @@ type JwtPayload = {
 };
 
 export function SiteHeader() {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [progress, setProgress] = useState(0);
   const [userEmail, setUserEmail] = useState("");
@@ -117,6 +119,10 @@ export function SiteHeader() {
   const initials = userEmail.slice(0, 2).toUpperCase();
   const appHref = userRole === "SUPERADMIN" ? "/superadmin" : "/dashboard";
 
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/90 shadow-sm shadow-slate-950/5 backdrop-blur-xl">
       <span
@@ -124,12 +130,12 @@ export function SiteHeader() {
         className="scroll-progress fixed left-0 top-0 z-[60] h-1 w-full"
         style={{ transform: `scaleX(${progress})` }}
       />
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-3 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-3" aria-label="InvoiceForge home">
-          <span className="grid h-9 w-9 place-items-center rounded-md bg-slate-950 text-sm font-bold text-white shadow-lg shadow-teal-900/15">
+          <span className="grid h-9 w-9 place-items-center rounded-xl bg-slate-950 text-sm font-bold text-white shadow-lg shadow-teal-900/15">
             IF
           </span>
-          <span className="text-lg font-semibold tracking-tight text-slate-950">
+          <span className="text-base font-bold tracking-tight text-slate-950 sm:text-lg">
             InvoiceForge
           </span>
         </Link>
@@ -181,53 +187,83 @@ export function SiteHeader() {
           aria-label="Toggle menu"
           aria-expanded={open}
           onClick={() => setOpen((value) => !value)}
-          className="grid h-10 w-10 place-items-center rounded-md border border-slate-200 text-slate-950 lg:hidden"
+          className={`grid h-10 w-10 place-items-center rounded-xl border transition lg:hidden ${
+            open
+              ? "border-slate-950 bg-slate-950 text-white"
+              : "border-slate-200 bg-white text-slate-950"
+          }`}
         >
-          <span className="text-xl leading-none">{open ? "x" : "="}</span>
+          {open ? (
+            <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" d="M6 6l12 12M18 6 6 18" />
+            </svg>
+          ) : (
+            <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" d="M5 7h14M5 12h14M5 17h14" />
+            </svg>
+          )}
         </button>
       </div>
 
       {open ? (
-        <div className="border-t border-slate-200 bg-white lg:hidden">
-          <nav className="mx-auto grid max-w-7xl gap-1 px-4 py-4 sm:px-6">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setOpen(false)}
-                className="rounded-md px-3 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100"
-              >
-                {item.label}
+        <div className="border-t border-slate-200 bg-[#f5f7fb] p-3 shadow-2xl shadow-slate-950/15 lg:hidden">
+          <nav className="mx-auto max-w-2xl rounded-2xl border border-slate-200 bg-white p-3">
+            <div className="rounded-xl bg-slate-950 p-4 text-white">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-cyan-200">
+                Proposal to payment
+              </p>
+              <p className="mt-2 text-lg font-bold">
+                Run your client workflow from one workspace.
+              </p>
+            </div>
+
+            <p className="mb-2 mt-4 px-1 text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">
+              Explore
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              {navItems.map((item, index) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm font-semibold text-slate-700 hover:border-teal-200 hover:bg-teal-50"
+                >
+                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-slate-100 text-[10px] font-black text-slate-600">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <span className="truncate">{item.label}</span>
+                </Link>
+              ))}
+              <Link href="/security" onClick={() => setOpen(false)} className="rounded-xl border border-slate-200 px-3 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+                Security
               </Link>
-            ))}
-            <Link href="/security" onClick={() => setOpen(false)} className="rounded-md px-3 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100">
-              Security
-            </Link>
-            <Link href="/contact" onClick={() => setOpen(false)} className="rounded-md px-3 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100">
-              Contact
-            </Link>
+              <Link href="/contact" onClick={() => setOpen(false)} className="rounded-xl border border-slate-200 px-3 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+                Contact
+              </Link>
+            </div>
+
             {isLoggedIn ? (
-              <div className="mt-3 grid gap-2">
-                <Link href={appHref} className="rounded-md bg-teal-600 px-4 py-3 text-center text-sm font-semibold text-white">
+              <div className="mt-3 grid gap-2 border-t border-slate-100 pt-3">
+                <Link href={appHref} className="rounded-xl bg-teal-600 px-4 py-3 text-center text-sm font-bold text-white">
                   {userRole === "SUPERADMIN" ? "Superadmin" : "Dashboard"}
                 </Link>
-                <Link href={appHref} className="rounded-md border border-slate-200 px-4 py-3 text-center text-sm font-semibold">
+                <Link href={appHref} className="truncate rounded-xl border border-slate-200 px-4 py-3 text-center text-sm font-semibold">
                   {userEmail}
                 </Link>
               </div>
             ) : (
-              <div className="mt-3 grid gap-2 sm:grid-cols-3">
-                <Link href="/portal/login" className="rounded-md border border-slate-200 px-4 py-3 text-center text-sm font-semibold">
-                  Client Login
+              <div className="mt-3 grid grid-cols-2 gap-2 border-t border-slate-100 pt-3">
+                <Link href="/login" className="rounded-xl border border-slate-300 px-3 py-3 text-center text-sm font-bold text-slate-800">
+                  Company login
                 </Link>
-                <Link href="/login" className="rounded-md border border-slate-200 px-4 py-3 text-center text-sm font-semibold">
-                  Log in
+                <Link href="/portal/login" className="rounded-xl border border-slate-300 px-3 py-3 text-center text-sm font-bold text-slate-800">
+                  Client login
                 </Link>
-                <Link href="/demo" className="rounded-md border border-slate-200 px-4 py-3 text-center text-sm font-semibold">
+                <Link href="/demo" className="rounded-xl border border-slate-300 px-3 py-3 text-center text-sm font-bold text-slate-800">
                   Book demo
                 </Link>
-                <Link href="/signup" className="rounded-md bg-teal-600 px-4 py-3 text-center text-sm font-semibold text-white">
-                  Sign up
+                <Link href="/signup" className="rounded-xl bg-teal-600 px-3 py-3 text-center text-sm font-bold text-white">
+                  Start free
                 </Link>
               </div>
             )}

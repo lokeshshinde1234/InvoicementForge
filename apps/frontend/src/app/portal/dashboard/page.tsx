@@ -327,23 +327,23 @@ export default function ClientPortalDashboardPage() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#f6f8fb] text-slate-950">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(20,184,166,0.16),transparent_34%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.13),transparent_30%),linear-gradient(90deg,rgba(15,23,42,0.035)_1px,transparent_1px),linear-gradient(rgba(15,23,42,0.035)_1px,transparent_1px)] bg-[size:auto,auto,56px_56px,56px_56px]" />
-      <div className="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <header className="sticky top-4 z-20 flex flex-col gap-4 rounded-2xl border border-white/80 bg-white/90 p-4 shadow-xl shadow-slate-950/10 backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex min-w-0 items-center gap-4">
-            <CompanyLogo branding={data.company} size="lg" />
+      <div className="relative mx-auto max-w-7xl px-3 py-3 sm:px-6 sm:py-6 lg:px-8">
+        <header className="sticky top-2 z-20 rounded-2xl border border-white/80 bg-white/95 p-3 shadow-xl shadow-slate-950/10 backdrop-blur-xl sm:top-4 sm:flex sm:items-center sm:justify-between sm:p-4">
+          <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+            <CompanyLogo branding={data.company} size="md" />
             <div className="min-w-0">
               <p className="truncate text-xs font-black uppercase tracking-[0.2em] text-teal-700">
                 {data.company.name}
               </p>
-              <h1 className="mt-1 truncate text-2xl font-black tracking-tight sm:text-3xl">
+              <h1 className="mt-1 truncate text-xl font-black tracking-tight sm:text-3xl">
                 Client workspace
               </h1>
-              <p className="mt-1 truncate text-sm text-slate-600">
+              <p className="mt-1 truncate text-xs text-slate-600 sm:text-sm">
                 Welcome, {data.client.name} · {data.client.companyName ?? data.client.email ?? "Verified client"}
               </p>
             </div>
           </div>
-          <div className="flex w-full flex-col gap-2 sm:ml-auto sm:w-auto sm:flex-row sm:items-center sm:justify-end">
+          <div className="mt-3 grid w-full grid-cols-[44px_1fr_1fr] gap-2 sm:ml-auto sm:mt-0 sm:flex sm:w-auto sm:items-center sm:justify-end">
             <details
               className="relative"
               onToggle={(event) => {
@@ -353,7 +353,7 @@ export default function ClientPortalDashboardPage() {
               <summary
                 aria-label="Open notifications"
                 title="Notifications"
-                className="relative flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-full border border-slate-200 bg-white text-slate-800 transition hover:-translate-y-0.5 hover:border-teal-400 hover:text-teal-800 hover:shadow-md"
+                className="relative flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-800 transition hover:-translate-y-0.5 hover:border-teal-400 hover:text-teal-800 hover:shadow-md"
               >
                 <BellIcon />
                 <span className="absolute -right-2 -top-2 rounded-full bg-teal-700 px-1.5 py-0.5 text-[10px] font-bold text-white">
@@ -380,28 +380,28 @@ export default function ClientPortalDashboardPage() {
             </details>
             <Link
               href="/portal/change-password"
-              className="inline-flex h-10 items-center justify-center rounded-full border border-slate-200 bg-white px-4 text-sm font-bold text-slate-800 transition hover:-translate-y-0.5 hover:border-teal-500 hover:shadow-md"
+              className="inline-flex h-10 min-w-0 items-center justify-center rounded-xl border border-slate-200 bg-white px-2 text-xs font-bold text-slate-800 transition hover:-translate-y-0.5 hover:border-teal-500 hover:shadow-md sm:px-4 sm:text-sm"
             >
               Password settings
             </Link>
             <button
               type="button"
               onClick={logout}
-              className="h-10 rounded-full border border-slate-200 bg-white px-4 text-sm font-bold text-slate-800 transition hover:-translate-y-0.5 hover:border-slate-950 hover:shadow-md"
+              className="h-10 rounded-xl border border-slate-200 bg-white px-2 text-xs font-bold text-slate-800 transition hover:-translate-y-0.5 hover:border-slate-950 hover:shadow-md sm:px-4 sm:text-sm"
             >
               Logout
             </button>
           </div>
         </header>
 
-        <section className="mt-6 grid gap-4 md:grid-cols-4">
+        <section className="mt-4 grid grid-cols-2 gap-3 sm:mt-6 md:grid-cols-4 md:gap-4">
           <InfoCard label="Client email" value={data.client.email ?? "Not added"} />
           <InfoCard label="Documents" value={String(documentCount)} />
           <InfoCard label="Open balance" value={formatMoney(openInvoiceTotal)} />
           <InfoCard label="Overdue invoices" value={String(overdueInvoiceCount)} />
         </section>
 
-        <section className="mt-6 overflow-hidden rounded-3xl border border-slate-900 bg-slate-950 p-6 text-white shadow-2xl shadow-slate-950/20">
+        <section className="mt-4 overflow-hidden rounded-2xl border border-slate-900 bg-slate-950 p-4 text-white shadow-2xl shadow-slate-950/20 sm:mt-6 sm:rounded-3xl sm:p-6">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <p className="text-xs font-black uppercase tracking-[0.22em] text-teal-200">
@@ -482,7 +482,7 @@ export default function ClientPortalDashboardPage() {
           </aside>
         </section>
 
-        <section className="mt-6 rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-xl shadow-slate-950/10 backdrop-blur">
+        <section className="mt-6 rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-xl shadow-slate-950/10 backdrop-blur sm:rounded-3xl sm:p-5">
           <div className="flex flex-col gap-3 border-b border-slate-200 pb-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <p className="text-sm font-semibold uppercase tracking-wide text-teal-700">
@@ -507,7 +507,7 @@ export default function ClientPortalDashboardPage() {
           ) : (
             <div className="mt-5 grid gap-4">
               {gstData.invoices.map((invoice) => (
-                <div key={invoice.id} className="rounded-md border border-slate-200 bg-white p-4 shadow-sm">
+                <div key={invoice.id} className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                       <p className="text-sm font-semibold">{invoice.invoiceNumber}</p>
@@ -522,8 +522,8 @@ export default function ClientPortalDashboardPage() {
                       View invoice
                     </Link>
                   </div>
-                  <div className="mt-4 overflow-x-auto">
-                    <table className="w-full min-w-[720px] text-left text-xs">
+                  <div className="mobile-table-scroll mt-4 overflow-x-auto">
+                    <table className="mobile-card-table w-full min-w-[720px] text-left text-xs">
                       <thead className="border-b border-slate-200 text-slate-500">
                         <tr>
                           <th className="py-2 font-semibold">Item</th>
@@ -536,11 +536,11 @@ export default function ClientPortalDashboardPage() {
                       <tbody className="divide-y divide-slate-100">
                         {invoice.lineItems.map((item, index) => (
                           <tr key={`${invoice.id}-${index}`}>
-                            <td className="py-3 font-medium">{item.description}</td>
-                            <td className="py-3">HSN {item.hsnCode || "-"} / SAC {item.sacCode || "-"}</td>
-                            <td className="py-3">{item.gstRate ?? 0}%</td>
-                            <td className="py-3">TDS {item.tdsRate ?? 0}% / TCS {item.tcsRate ?? 0}%</td>
-                            <td className="py-3 text-right font-semibold">{formatMoney(Number(item.total ?? invoice.total))}</td>
+                            <td data-label="Item" className="py-3 font-medium">{item.description}</td>
+                            <td data-label="HSN/SAC" className="py-3">HSN {item.hsnCode || "-"} / SAC {item.sacCode || "-"}</td>
+                            <td data-label="GST" className="py-3">{item.gstRate ?? 0}%</td>
+                            <td data-label="TDS/TCS" className="py-3">TDS {item.tdsRate ?? 0}% / TCS {item.tcsRate ?? 0}%</td>
+                            <td data-label="Amount" className="py-3 text-right font-semibold">{formatMoney(Number(item.total ?? invoice.total))}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -579,11 +579,11 @@ export default function ClientPortalDashboardPage() {
 
 function InfoCard({ label, value }: { label: string; value: string }) {
   return (
-    <article className="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-lg shadow-slate-950/5 backdrop-blur">
+    <article className="rounded-2xl border border-slate-200 bg-white/90 p-3 shadow-lg shadow-slate-950/5 backdrop-blur sm:p-5">
       <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">
         {label}
       </p>
-      <p className="mt-3 truncate text-lg font-black text-slate-950">{value}</p>
+      <p className="mt-2 break-words text-sm font-black text-slate-950 sm:mt-3 sm:text-lg">{value}</p>
     </article>
   );
 }
@@ -798,7 +798,7 @@ function InfoPill({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-xl border border-slate-200 bg-white px-3 py-2">
       <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">{label}</p>
-      <p className="mt-1 truncate font-bold text-slate-800">{value}</p>
+      <p className="mt-1 break-words font-bold text-slate-800">{value}</p>
     </div>
   );
 }
@@ -819,7 +819,7 @@ function DocumentPanel({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-xl shadow-slate-950/10 backdrop-blur">
+    <section className="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-xl shadow-slate-950/10 backdrop-blur sm:rounded-3xl sm:p-5">
       <div className="border-b border-slate-200 pb-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
@@ -860,10 +860,10 @@ function DocumentRow({
   return (
     <Link
       href={href}
-      className="flex items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm transition hover:-translate-y-0.5 hover:border-teal-200 hover:shadow-md"
+      className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-3 shadow-sm transition hover:-translate-y-0.5 hover:border-teal-200 hover:shadow-md sm:flex sm:justify-between sm:gap-4 sm:px-4"
     >
       <div className="min-w-0">
-        <p className="truncate text-sm font-semibold">{title}</p>
+        <p className="break-words text-sm font-semibold">{title}</p>
         <p className="mt-1 text-xs font-black uppercase tracking-[0.16em] text-teal-700">
           {meta}
         </p>
