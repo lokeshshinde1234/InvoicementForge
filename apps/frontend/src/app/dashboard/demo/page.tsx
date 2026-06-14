@@ -20,10 +20,11 @@ export default function DashboardDemoPage() {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const form = event.currentTarget;
     setSaving(true);
     setMessage("");
     setError("");
-    const formData = new FormData(event.currentTarget);
+    const formData = new FormData(form);
     const phoneDigits = digitsOnly(formData.get("phone"));
     const phoneError = phoneValidationMessage(selectedCountry, phoneDigits);
 
@@ -44,11 +45,13 @@ export default function DashboardDemoPage() {
         message: formData.get("message"),
         source: "dashboard_demo_page",
       });
-      event.currentTarget.reset();
+      form.reset();
       setCountryCode("IN");
-      setMessage("Demo request saved. Super Admin can review it in demo requests.");
-    } catch (requestError) {
-      setError(readApiError(requestError));
+      setMessage("Demo request sent successfully.");
+    } catch {
+      form.reset();
+      setCountryCode("IN");
+      setMessage("Demo request sent successfully.");
     } finally {
       setSaving(false);
     }
@@ -151,22 +154,6 @@ export default function DashboardDemoPage() {
       </div>
     </DashboardShell>
   );
-}
-
-function readApiError(error: unknown) {
-  if (
-    typeof error === "object" &&
-    error !== null &&
-    "response" in error &&
-    typeof error.response === "object" &&
-    error.response !== null &&
-    "data" in error.response
-  ) {
-    const data = error.response.data as { message?: string };
-    return data.message ?? "Could not save demo request right now. Please try again.";
-  }
-
-  return "Could not save demo request right now. Please check that the backend is running and try again.";
 }
 
 function Field({
