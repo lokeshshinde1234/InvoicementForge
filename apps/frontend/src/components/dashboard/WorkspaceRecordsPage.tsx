@@ -216,7 +216,7 @@ export function WorkspaceRecordsPage({
   return (
     <DashboardShell active={active}>
       <div className="space-y-6">
-        <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+        <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
               <p className="text-sm font-semibold uppercase tracking-wide text-teal-700">
@@ -229,7 +229,7 @@ export function WorkspaceRecordsPage({
                 {description}
               </p>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="mobile-stack-actions flex flex-wrap gap-2">
               {actions.map((action) =>
                 action.href ? (
                   <Link
@@ -275,7 +275,7 @@ export function WorkspaceRecordsPage({
         </section>
 
         <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-          <div className="flex gap-2 overflow-x-auto">
+          <div className="mobile-table-scroll flex gap-2 overflow-x-auto pb-1">
             {tabs.map((tab) => {
               const count = records.filter(tab.filter).length;
               const selected = tab.id === selectedTab;
@@ -327,8 +327,8 @@ export function WorkspaceRecordsPage({
               <EmptyState title={emptyTitle} description={emptyDescription} />
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[760px] text-left text-sm">
+            <div className="mobile-table-scroll overflow-x-auto">
+              <table className="mobile-card-table w-full min-w-[760px] text-left text-sm">
                 <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                   <tr>
                     <th className="px-5 py-3 font-semibold">Record</th>
@@ -342,7 +342,7 @@ export function WorkspaceRecordsPage({
                 <tbody className="divide-y divide-slate-100">
                   {paginatedRecords.map((record) => (
                     <tr key={record.id} className="hover:bg-slate-50">
-                      <td className="px-5 py-4">
+                      <td data-label="Record" className="px-5 py-4">
                         <div>
                           <p className="font-semibold text-slate-950">{record.title}</p>
                           {record.subtitle ? (
@@ -358,18 +358,18 @@ export function WorkspaceRecordsPage({
                           ) : null}
                         </div>
                       </td>
-                      <td className="px-5 py-4 text-slate-600">
+                      <td data-label="Section" className="px-5 py-4 text-slate-600">
                         {record.category ?? record.sourceLabel ?? active}
                       </td>
-                      <td className="px-5 py-4">
+                      <td data-label="Status" className="px-5 py-4">
                         <StatusBadge status={record.status ?? "READY"} />
                       </td>
-                      <td className="px-5 py-4 font-medium text-slate-700">
+                      <td data-label="Amount" className="px-5 py-4 font-medium text-slate-700">
                         {formatAmount(record.amount, record.currency)}
                       </td>
-                      <td className="px-5 py-4 text-slate-600">{formatDate(record.date)}</td>
-                      <td className="px-5 py-4">
-                        <div className="flex justify-end gap-2">
+                      <td data-label="Date" className="px-5 py-4 text-slate-600">{formatDate(record.date)}</td>
+                      <td data-label="Actions" className="px-5 py-4">
+                        <div className="flex flex-wrap justify-start gap-2 sm:justify-end">
                           {record.href ? (
                             <Link
                               href={record.href}

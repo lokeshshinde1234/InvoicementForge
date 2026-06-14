@@ -336,8 +336,8 @@ function TeamRecordsContent({ section }: { section: TeamSection }) {
                 <EmptyState title="No team users found" description="Add an admin or member to start building your team." />
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[720px] text-left text-sm">
+              <div className="mobile-table-scroll overflow-x-auto">
+                <table className="mobile-card-table w-full min-w-[720px] text-left text-sm">
                   <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                     <tr>
                       <th className="px-5 py-3">User</th>
@@ -349,13 +349,13 @@ function TeamRecordsContent({ section }: { section: TeamSection }) {
                   <tbody className="divide-y divide-slate-100">
                     {visibleUsers.map((user) => (
                       <tr key={user.id}>
-                        <td className="px-5 py-4 font-semibold">{user.email}</td>
-                        <td className="px-5 py-4">{user.role}</td>
-                        <td className="px-5 py-4">
+                        <td data-label="User" className="break-all px-5 py-4 font-semibold">{user.email}</td>
+                        <td data-label="Role" className="px-5 py-4">{user.role}</td>
+                        <td data-label="Status" className="px-5 py-4">
                           <StatusBadge status={user.isActive ? "ACTIVE" : "INACTIVE"} />
                         </td>
-                        <td className="px-5 py-4">
-                          <div className="flex justify-end gap-2">
+                        <td data-label="Actions" className="px-5 py-4">
+                          <div className="flex flex-wrap justify-start gap-2 sm:justify-end">
                             <button
                               type="button"
                               onClick={() => editUser(user)}

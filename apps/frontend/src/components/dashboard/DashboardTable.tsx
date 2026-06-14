@@ -29,8 +29,8 @@ export function DashboardTable<T>({
 }) {
   return (
     <section className="rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-5 py-4">
-        <div>
+      <div className="mobile-stack-actions flex items-center justify-between gap-3 border-b border-slate-200 px-4 py-4 sm:px-5">
+        <div className="min-w-0">
           <h2 className="text-base font-semibold">{title}</h2>
           <p className="mt-1 text-sm text-slate-500">{description}</p>
         </div>
@@ -42,8 +42,8 @@ export function DashboardTable<T>({
           <EmptyState title={emptyTitle} description={emptyDescription} />
         </div>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[680px] text-left text-sm">
+        <div className="mobile-table-scroll overflow-x-auto">
+          <table className="mobile-card-table w-full min-w-[680px] text-left text-sm">
             <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
               <tr>
                 {columns.map((column) => (
@@ -64,6 +64,7 @@ export function DashboardTable<T>({
                   {columns.map((column) => (
                     <td
                       key={column.key}
+                      data-label={column.header}
                       className={`px-5 py-4 ${
                         column.align === "right" ? "text-right" : ""
                       }`}

@@ -19,13 +19,13 @@ export function DashboardHeader({
     <section className="overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm">
       <div className="relative">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(20,184,166,0.16),transparent_34%),radial-gradient(circle_at_top_right,rgba(56,189,248,0.12),transparent_32%)]" />
-        <div className="relative px-6 py-6 lg:px-8 lg:py-7">
+        <div className="relative px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-7">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
               <p className="text-sm font-semibold uppercase tracking-wide text-teal-700">
                 {eyebrow}
               </p>
-              <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
+              <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
                 {title}
               </h1>
               <p className="mt-3 text-sm leading-7 text-slate-600 sm:text-base">
@@ -44,7 +44,7 @@ export function DashboardHeader({
               </div>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid w-full gap-3 sm:w-auto sm:grid-cols-2">
               <Link
                 href="/invoices/new"
                 className="inline-flex h-10 items-center justify-center rounded-md bg-teal-600 px-4 text-sm font-semibold text-white transition hover:bg-teal-700"

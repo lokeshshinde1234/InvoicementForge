@@ -300,7 +300,7 @@ export default function ClientInvoicePaymentPage({ params }: PageParams) {
         </div>
 
         <header className="mt-4 overflow-hidden rounded-lg border border-white/80 bg-white shadow-2xl shadow-slate-950/10">
-          <div className="bg-slate-950 px-6 py-5 text-white">
+          <div className="bg-slate-950 px-4 py-5 text-white sm:px-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="text-sm font-bold uppercase tracking-wide text-teal-200">
                 Invoice review
@@ -311,8 +311,8 @@ export default function ClientInvoicePaymentPage({ params }: PageParams) {
             </div>
           </div>
           <div className="mt-3 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div className="px-6 pb-6">
-              <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+            <div className="px-4 pb-5 sm:px-6 sm:pb-6">
+              <h1 className="break-words text-2xl font-semibold tracking-tight sm:text-4xl">
                 {invoice.invoiceNumber}
               </h1>
               <p className="mt-3 text-sm leading-6 text-slate-600">
@@ -320,7 +320,7 @@ export default function ClientInvoicePaymentPage({ params }: PageParams) {
                 choosing a payment method.
               </p>
             </div>
-            <div className="mx-6 mb-6 rounded-md bg-blue-50 px-4 py-3 text-blue-950 ring-1 ring-blue-100 lg:mx-6">
+            <div className="mx-4 mb-5 rounded-md bg-blue-50 px-4 py-3 text-blue-950 ring-1 ring-blue-100 sm:mx-6 sm:mb-6 lg:mx-6">
               <p className="text-xs font-bold uppercase tracking-wide text-blue-700">
                 Amount due
               </p>
@@ -346,8 +346,8 @@ export default function ClientInvoicePaymentPage({ params }: PageParams) {
                 </p>
               </div>
 
-              <div className="m-5 overflow-hidden rounded-md border border-slate-200">
-                <div className="grid grid-cols-[1fr_80px_120px] bg-slate-950 px-4 py-3 text-xs font-bold uppercase tracking-wide text-white">
+              <div className="m-3 overflow-hidden rounded-md border border-slate-200 sm:m-5">
+                <div className="grid grid-cols-[minmax(0,1fr)_48px_88px] bg-slate-950 px-3 py-3 text-[10px] font-bold uppercase tracking-wide text-white sm:grid-cols-[1fr_80px_120px] sm:px-4 sm:text-xs">
                   <span>Description</span>
                   <span className="text-right">Qty</span>
                   <span className="text-right">Total</span>
@@ -355,10 +355,10 @@ export default function ClientInvoicePaymentPage({ params }: PageParams) {
                 {invoice.lineItems.map((item, index) => (
                   <div
                     key={`${item.description}-${index}`}
-                    className="grid grid-cols-[1fr_80px_120px] border-t border-slate-200 bg-white px-4 py-3 text-sm"
+                    className="grid grid-cols-[minmax(0,1fr)_48px_88px] gap-1 border-t border-slate-200 bg-white px-3 py-3 text-xs sm:grid-cols-[1fr_80px_120px] sm:px-4 sm:text-sm"
                   >
                     <div className="min-w-0">
-                      <p className="font-semibold text-slate-900">{item.description}</p>
+                      <p className="break-words font-semibold text-slate-900">{item.description}</p>
                       <p className="mt-1 text-xs text-slate-500">
                         Rate {formatCurrency(item.unitPrice)} | GST {Number(item.gstRate ?? 0)}%
                       </p>

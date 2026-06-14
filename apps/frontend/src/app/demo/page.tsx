@@ -70,7 +70,7 @@ export default function DemoPage() {
               Request a walkthrough of branded proposals, templates, quoting,
               signatures, client portals, GST invoices, and backend-connected auth.
             </p>
-            <div className="mt-8 flex gap-3">
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link href="/signup" className="rounded-md bg-teal-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-teal-900/15 transition hover:-translate-y-0.5">
                 Start free trial
               </Link>
@@ -79,7 +79,7 @@ export default function DemoPage() {
               </Link>
             </div>
           </div>
-          <form onSubmit={handleSubmit} className="proposal-shadow rounded-lg border border-white/80 bg-white/95 p-6 backdrop-blur">
+          <form onSubmit={handleSubmit} className="proposal-shadow rounded-lg border border-white/80 bg-white/95 p-4 backdrop-blur sm:p-6">
             <h2 className="text-xl font-semibold">Book your demo</h2>
             <div className="mt-5 space-y-4">
               {[
@@ -94,7 +94,7 @@ export default function DemoPage() {
               ))}
               <label className="block">
                 <span className="text-sm font-medium text-slate-700">Phone</span>
-                <div className="mt-2 grid grid-cols-[132px_1fr] gap-2">
+                <div className="mt-2 grid gap-2 sm:grid-cols-[132px_1fr]">
                   <select
                     name="phoneCountry"
                     value={countryCode}

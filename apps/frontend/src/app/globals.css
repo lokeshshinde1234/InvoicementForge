@@ -29,6 +29,125 @@ body {
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 5rem;
+  overflow-x: hidden;
+}
+
+body {
+  min-width: 320px;
+  overflow-x: hidden;
+}
+
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+}
+
+input,
+select,
+textarea,
+button {
+  min-width: 0;
+}
+
+.mobile-table-scroll {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-color: rgb(148 163 184) rgb(241 245 249);
+  scrollbar-width: thin;
+}
+
+.mobile-table-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.mobile-table-scroll::-webkit-scrollbar-track {
+  background: rgb(241 245 249);
+}
+
+.mobile-table-scroll::-webkit-scrollbar-thumb {
+  background: rgb(148 163 184);
+  border: 2px solid rgb(241 245 249);
+  border-radius: 999px;
+}
+
+@media (max-width: 639px) {
+  .mobile-card-table,
+  .mobile-card-table tbody,
+  .mobile-card-table tr,
+  .mobile-card-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .mobile-card-table {
+    min-width: 0 !important;
+  }
+
+  .mobile-card-table thead {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+  }
+
+  .mobile-card-table tbody {
+    display: grid;
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+
+  .mobile-card-table tbody tr {
+    border: 1px solid rgb(226 232 240);
+    border-radius: 0.875rem;
+    box-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
+    overflow: hidden;
+  }
+
+  .mobile-card-table tbody td {
+    align-items: flex-start;
+    border-bottom: 1px solid rgb(241 245 249);
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: minmax(5.5rem, 34%) minmax(0, 1fr);
+    padding: 0.75rem 0.875rem !important;
+    text-align: left !important;
+  }
+
+  .mobile-card-table tbody td:last-child {
+    border-bottom: 0;
+  }
+
+  .mobile-card-table tbody td::before {
+    color: rgb(100 116 139);
+    content: attr(data-label);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: 1.25rem;
+    text-transform: uppercase;
+  }
+
+  .mobile-card-table tbody td > * {
+    min-width: 0;
+  }
+
+  .mobile-stack-actions {
+    align-items: stretch !important;
+    flex-direction: column !important;
+  }
+
+  .mobile-stack-actions > a,
+  .mobile-stack-actions > button {
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+  }
 }
 
 @keyframes flow {

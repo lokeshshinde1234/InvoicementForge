@@ -183,10 +183,10 @@ export function DashboardShell({
 
         <section className="min-w-0">
           <header className="sticky top-0 z-30 border-b border-slate-200 bg-white">
-            <div className="flex h-16 items-center gap-3 px-4 sm:px-6 lg:px-8">
-              <Link href="/dashboard" className="flex items-center gap-3 lg:hidden">
+            <div className="flex h-16 items-center gap-2 px-3 sm:gap-3 sm:px-6 lg:px-8">
+              <Link href="/dashboard" className="flex min-w-0 items-center gap-2 sm:gap-3 lg:hidden">
                 <CompanyLogo branding={branding} size="sm" />
-                <span className="text-sm font-semibold">
+                <span className="max-w-32 truncate text-sm font-semibold sm:max-w-none">
                   {branding?.name ?? "InvoiceForge"}
                 </span>
               </Link>
@@ -216,7 +216,7 @@ export function DashboardShell({
                 <button
                   type="button"
                   onClick={() => setProfileOpen((open) => !open)}
-                  className="flex h-10 items-center gap-3 rounded-md border border-slate-200 bg-white px-2 pr-3 text-left shadow-sm hover:bg-slate-50"
+                  className="flex h-10 items-center gap-2 rounded-md border border-slate-200 bg-white px-2 text-left shadow-sm hover:bg-slate-50 sm:gap-3 sm:pr-3"
                   aria-expanded={profileOpen}
                   aria-label="Open profile menu"
                 >
@@ -263,8 +263,8 @@ export function DashboardShell({
                 ) : null}
               </div>
             </div>
-            <div className="border-t border-slate-100 bg-white px-4 py-3 lg:hidden">
-              <div className="flex gap-2 overflow-x-auto">
+            <div className="border-t border-slate-100 bg-white px-3 py-2.5 sm:px-4 sm:py-3 lg:hidden">
+              <div className="mobile-table-scroll flex gap-2 overflow-x-auto pb-1">
                 {navItems.map(([label, href]) => {
                   const selected =
                     href === "/dashboard"
@@ -289,7 +289,7 @@ export function DashboardShell({
             </div>
           </header>
 
-          <div className="px-4 py-6 sm:px-6 lg:px-8">{children}</div>
+          <div className="px-3 py-4 sm:px-6 sm:py-6 lg:px-8">{children}</div>
         </section>
       </div>
     </main>

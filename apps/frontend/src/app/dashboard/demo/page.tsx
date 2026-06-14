@@ -82,14 +82,14 @@ export default function DashboardDemoPage() {
           </div>
         </section>
 
-        <form onSubmit={submit} className="rounded-2xl border border-white/80 bg-white/90 p-6 shadow-xl shadow-slate-950/10 backdrop-blur">
+        <form onSubmit={submit} className="rounded-2xl border border-white/80 bg-white/90 p-4 shadow-xl shadow-slate-950/10 backdrop-blur sm:p-6">
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Name" name="name" required />
             <Field label="Work email" name="email" type="email" required />
             <Field label="Company" name="company" required />
             <label className="grid gap-2 text-sm font-bold text-slate-700">
               Phone
-              <div className="grid grid-cols-[140px_1fr] gap-2">
+              <div className="grid gap-2 sm:grid-cols-[140px_1fr]">
                 <select
                   name="phoneCountry"
                   value={countryCode}
@@ -143,7 +143,7 @@ export default function DashboardDemoPage() {
           <button
             type="submit"
             disabled={saving}
-            className="shine mt-5 h-11 rounded-lg bg-slate-950 px-5 text-sm font-black text-white shadow-lg shadow-slate-950/20 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+            className="shine mt-5 h-11 w-full rounded-lg bg-slate-950 px-5 text-sm font-black text-white shadow-lg shadow-slate-950/20 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
           >
             {saving ? "Saving..." : "Request demo"}
           </button>

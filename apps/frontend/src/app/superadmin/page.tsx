@@ -202,10 +202,11 @@ export default function SuperadminPage() {
                 </button>
               </div>
             </div>
+            <SuperadminMobileNav active="/superadmin" />
           </header>
 
-          <div className="px-4 py-6 sm:px-6 lg:px-8">
-            <section className="rounded-xl border border-slate-200 bg-slate-950 p-6 text-white shadow-xl">
+          <div className="px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
+            <section className="rounded-xl border border-slate-200 bg-slate-950 p-4 text-white shadow-xl sm:p-6">
               <p className="text-xs font-bold uppercase tracking-[0.24em] text-cyan-200">
                 Live company operations
               </p>
@@ -252,13 +253,13 @@ export default function SuperadminPage() {
                   Open all companies
                 </Link>
               </div>
-              <div className="overflow-x-auto p-5">
+              <div className="mobile-table-scroll overflow-x-auto p-3 sm:p-5">
                 {error ? (
                   <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm font-semibold text-amber-800">
                     {error}
                   </div>
                 ) : null}
-                <table className="w-full min-w-[1040px] text-left text-sm">
+                <table className="mobile-card-table w-full min-w-[1040px] text-left text-sm">
                   <thead className="text-xs uppercase tracking-[0.16em] text-slate-400">
                     <tr>
                       <th className="border-b border-slate-100 py-3 pr-4">Company</th>
@@ -275,20 +276,20 @@ export default function SuperadminPage() {
                   <tbody className="divide-y divide-slate-100">
                     {companies.slice(0, 10).map((company) => (
                       <tr key={company.id} className="hover:bg-slate-50">
-                        <td className="py-4 pr-4">
+                        <td data-label="Company" className="py-4 pr-4">
                           <div className="flex items-center gap-3">
                             <CompanyLogo branding={company} size="sm" />
                             <span className="font-black text-slate-900">{company.name}</span>
                           </div>
                         </td>
-                        <td className="py-4 pr-4 text-slate-600">{company.subdomain}</td>
-                        <td className="py-4 pr-4 text-slate-600">{company.plan} / {company.billingCycle}</td>
-                        <td className="py-4 pr-4"><StatusBadge label={company.subscriptionStatus} /></td>
-                        <td className="py-4 pr-4 text-slate-600">{subscriptionDaysLeft(company)}</td>
-                        <td className="py-4 pr-4 text-slate-600">{company.userCount}</td>
-                        <td className="py-4 pr-4 text-slate-600">{company.clientCount}</td>
-                        <td className="py-4 pr-4 text-slate-600">{company.invoiceCount}</td>
-                        <td className="w-40 py-4 pl-4 pr-6 text-right">
+                        <td data-label="Workspace" className="break-all py-4 pr-4 text-slate-600">{company.subdomain}</td>
+                        <td data-label="Plan" className="py-4 pr-4 text-slate-600">{company.plan} / {company.billingCycle}</td>
+                        <td data-label="Subscription" className="py-4 pr-4"><StatusBadge label={company.subscriptionStatus} /></td>
+                        <td data-label="Days left" className="py-4 pr-4 text-slate-600">{subscriptionDaysLeft(company)}</td>
+                        <td data-label="Users" className="py-4 pr-4 text-slate-600">{company.userCount}</td>
+                        <td data-label="Clients" className="py-4 pr-4 text-slate-600">{company.clientCount}</td>
+                        <td data-label="Invoices" className="py-4 pr-4 text-slate-600">{company.invoiceCount}</td>
+                        <td data-label="Actions" className="w-40 py-4 pl-4 pr-6 text-right">
                           <button
                             type="button"
                             onClick={() => deleteCompany(company)}
@@ -343,6 +344,26 @@ function SuperadminSidebar({ active }: { active: string }) {
         </nav>
       </div>
     </aside>
+  );
+}
+
+function SuperadminMobileNav({ active }: { active: string }) {
+  return (
+    <nav className="mobile-table-scroll flex gap-2 overflow-x-auto border-t border-slate-100 px-3 py-2.5 xl:hidden">
+      {navItems.map(([label, href]) => (
+        <Link
+          key={href}
+          href={href}
+          className={`shrink-0 rounded-lg px-3 py-2 text-xs font-bold ${
+            href === active
+              ? "bg-slate-950 text-white"
+              : "bg-slate-100 text-slate-700"
+          }`}
+        >
+          {label}
+        </Link>
+      ))}
+    </nav>
   );
 }
 
