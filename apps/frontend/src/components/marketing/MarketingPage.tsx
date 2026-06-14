@@ -130,37 +130,121 @@ function LogoStrip() {
 }
 
 function Workflow() {
+  const steps = [
+    { title: "Create", copy: "Build reusable sections.", detail: "Brand-ready editor" },
+    { title: "Quote", copy: "Add products and options.", detail: "Interactive pricing" },
+    { title: "Send", copy: "Share a secure link.", detail: "Live delivery status" },
+    { title: "Sign", copy: "Capture acceptance.", detail: "Digital approvals" },
+    { title: "Invoice", copy: "Convert work to GST invoices.", detail: "One-click handoff" },
+  ];
+
   return (
-    <section className="mobile-section mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-      <SectionLabel label="How it works" title="The same sales-document structure buyers already understand." />
-      <div className="mt-10 grid gap-4 md:grid-cols-5">
-        {["Create", "Quote", "Send", "Sign", "Invoice"].map((step, index) => (
-          <Link key={step} href={index === 4 ? "/proposals/new" : "/features"} className="hover-lift rounded-lg border border-slate-200 bg-white p-5">
-            <span className="text-sm font-semibold text-teal-700">0{index + 1}</span>
-            <h3 className="mt-4 text-lg font-semibold">{step}</h3>
-            <p className="mt-2 text-sm leading-6 text-slate-600">
-              {["Build reusable sections.", "Add products and options.", "Share a secure link.", "Capture acceptance.", "Convert work to GST invoices."][index]}
-            </p>
-          </Link>
-        ))}
+    <section className="mobile-section relative overflow-hidden bg-slate-950 px-4 py-20 text-white sm:px-6 lg:px-8 lg:py-28">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_10%_10%,rgba(20,184,166,0.22),transparent_28%),radial-gradient(circle_at_85%_25%,rgba(59,130,246,0.18),transparent_30%)]" />
+      <div className="brand-dots absolute inset-0 opacity-15" />
+      <div className="relative mx-auto max-w-7xl">
+        <div className="grid gap-8 lg:grid-cols-[1fr_380px] lg:items-end">
+          <div className="max-w-3xl">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-teal-300">How it works</p>
+            <h2 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-5xl">
+              One connected flow from first draft to paid work.
+            </h2>
+          </div>
+          <p className="max-w-xl text-sm leading-7 text-slate-300 sm:text-base">
+            Replace scattered documents and follow-ups with a clear, buyer-friendly process your whole team can track.
+          </p>
+        </div>
+
+        <div className="relative mt-10 grid gap-3 md:grid-cols-5 lg:mt-14">
+          <div className="absolute left-[10%] right-[10%] top-8 hidden h-px bg-gradient-to-r from-transparent via-teal-300/60 to-transparent md:block" />
+          {steps.map((step, index) => (
+            <Link
+              key={step.title}
+              href={index === 4 ? "/proposals/new" : "/features"}
+              className="group relative rounded-2xl border border-white/10 bg-white/[0.06] p-4 backdrop-blur transition duration-300 hover:-translate-y-1 hover:border-teal-300/50 hover:bg-white/[0.1] sm:p-5"
+            >
+              <div className="flex items-center gap-4 md:block">
+                <span className="relative z-10 grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-teal-300/30 bg-slate-900 text-sm font-bold text-teal-300 shadow-[0_0_24px_rgba(45,212,191,0.12)] md:h-16 md:w-16 md:rounded-2xl">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <div className="md:mt-8">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-teal-300">{step.detail}</p>
+                  <h3 className="mt-1 text-lg font-semibold text-white md:mt-3">{step.title}</h3>
+                </div>
+              </div>
+              <p className="mt-4 text-sm leading-6 text-slate-300">{step.copy}</p>
+              <span className="mt-5 inline-flex items-center gap-2 text-xs font-semibold text-white/70 transition group-hover:text-teal-200">
+                Explore step <span aria-hidden="true">→</span>
+              </span>
+            </Link>
+          ))}
+        </div>
       </div>
     </section>
   );
 }
 
 function FeatureGrid({ features }: { features: MarketingContent["features"] }) {
+  const labels = ["Reusable", "Buyer-led", "Secure", "Real-time", "GST-ready", "Self-service"];
+  const accents = [
+    "from-teal-500/20 via-cyan-400/5 to-transparent",
+    "from-blue-500/20 via-indigo-400/5 to-transparent",
+    "from-violet-500/20 via-fuchsia-400/5 to-transparent",
+    "from-amber-500/20 via-orange-400/5 to-transparent",
+    "from-emerald-500/20 via-teal-400/5 to-transparent",
+    "from-sky-500/20 via-blue-400/5 to-transparent",
+  ];
+
   return (
-    <section className="mobile-section brand-grid border-y border-slate-200 bg-slate-50 px-4 py-20 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-7xl">
-        <SectionLabel label="Features" title="Everything needed to move from draft to signed deal." />
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {features.map((card, index) => (
-            <Link key={card.title} href="/features" className="mobile-card hover-lift relative rounded-lg border border-slate-200 bg-white p-6">
-              <span className="mb-5 grid h-10 w-10 place-items-center rounded-md bg-teal-50 text-sm font-bold text-teal-700">
-                {String(index + 1).padStart(2, "0")}
+    <section className="mobile-section brand-grid relative overflow-hidden border-y border-slate-200 bg-[#f4f8f7] px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+      <div className="absolute -right-32 top-20 h-80 w-80 rounded-full bg-teal-200/30 blur-3xl" />
+      <div className="relative mx-auto max-w-7xl">
+        <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
+          <SectionLabel label="Modern feature stack" title="Everything your team needs to close work without the busywork." />
+          <div className="flex flex-wrap gap-2 lg:justify-end">
+            {["Live deal visibility", "Secure client experience", "Finance-ready handoff"].map((item) => (
+              <span key={item} className="rounded-full border border-slate-200 bg-white/80 px-3 py-2 text-xs font-semibold text-slate-600 shadow-sm backdrop-blur">
+                {item}
               </span>
-              <h3 className="text-lg font-semibold">{card.title}</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{card.copy}</p>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-12 lg:gap-5">
+          {features.map((card, index) => (
+            <Link
+              key={card.title}
+              href="/features"
+              className={`group relative min-h-64 overflow-hidden rounded-2xl border border-white bg-white p-5 shadow-[0_18px_50px_rgba(15,23,42,0.07)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] sm:p-6 ${
+                index === 0 || index === 3 ? "lg:col-span-7" : "lg:col-span-5"
+              }`}
+            >
+              <div className={`absolute inset-0 bg-gradient-to-br ${accents[index % accents.length]}`} />
+              <div className="relative flex h-full flex-col">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="grid h-11 w-11 place-items-center rounded-xl bg-slate-950 text-sm font-bold text-white shadow-lg">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <span className="rounded-full border border-slate-200/80 bg-white/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-slate-600">
+                    {labels[index % labels.length]}
+                  </span>
+                </div>
+                <h3 className="mt-7 max-w-xl text-xl font-semibold tracking-tight text-slate-950 sm:text-2xl">{card.title}</h3>
+                <p className="mt-3 max-w-xl text-sm leading-6 text-slate-600">{card.copy}</p>
+                <div className="mt-auto pt-8">
+                  <div className="rounded-xl border border-slate-200/80 bg-white/70 p-3 backdrop-blur">
+                    <div className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                      <span className="h-2 w-16 rounded-full bg-slate-200" />
+                      <span className="ml-auto text-[10px] font-semibold uppercase tracking-wide text-slate-400">Live</span>
+                    </div>
+                    <div className="mt-3 grid grid-cols-[1fr_72px] gap-2">
+                      <span className="h-2 rounded-full bg-slate-200" />
+                      <span className="h-2 rounded-full bg-teal-200" />
+                    </div>
+                  </div>
+                </div>
+              </div>
             </Link>
           ))}
         </div>
@@ -208,18 +292,79 @@ function DemoPreview({ templates }: { templates: MarketingContent["templates"] }
 }
 
 function PricingTeaser({ plans }: { plans: MarketingContent["plans"] }) {
+  const audiences = ["For getting started", "For small teams", "For growing teams", "For complex organizations"];
+
   return (
-    <section className="mobile-section brand-grid border-y border-slate-200 bg-white px-4 py-20 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-7xl">
-        <SectionLabel label="Pricing" title="Plans shaped like modern proposal software." />
-        <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-          {plans.map((plan) => (
-            <div key={plan.name} className={`mobile-card hover-lift relative rounded-lg border bg-white p-6 ${plan.popular ? "border-teal-300 shadow-xl shadow-teal-900/10" : "border-slate-200"}`}>
-              {plan.popular ? <span className="rounded-md bg-teal-100 px-3 py-1 text-xs font-semibold text-teal-800">Most popular</span> : null}
+    <section className="mobile-section relative overflow-hidden border-y border-slate-800 bg-slate-950 px-4 py-20 text-white sm:px-6 lg:px-8 lg:py-28">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(20,184,166,0.18),transparent_35%)]" />
+      <div className="brand-dots absolute inset-0 opacity-10" />
+      <div className="relative mx-auto max-w-7xl">
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-teal-300">Simple pricing</p>
+          <h2 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-5xl">
+            Start lean. Add power as your deal flow grows.
+          </h2>
+          <p className="mx-auto mt-5 max-w-2xl text-sm leading-7 text-slate-300 sm:text-base">
+            Every plan is designed around real document volume, with a clear path from first proposal to enterprise operations.
+          </p>
+          <div className="mt-6 flex flex-wrap justify-center gap-2">
+            {["Annual pricing shown", "No setup fee", "Upgrade anytime"].map((item) => (
+              <span key={item} className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-2 text-xs font-medium text-slate-300">
+                <span className="mr-2 text-teal-300">✓</span>{item}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:items-stretch">
+          {plans.map((plan, index) => (
+            <div
+              key={plan.name}
+              className={`relative flex flex-col rounded-2xl border p-5 transition duration-300 hover:-translate-y-1 sm:p-6 ${
+                plan.popular
+                  ? "border-teal-300 bg-white text-slate-950 shadow-[0_24px_70px_rgba(20,184,166,0.2)]"
+                  : "border-white/10 bg-white/[0.05] text-white backdrop-blur"
+              }`}
+            >
+              {plan.popular ? (
+                <span className="absolute right-4 top-4 rounded-full bg-teal-100 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-teal-800">
+                  Most popular
+                </span>
+              ) : null}
+              <p className={`text-xs font-semibold uppercase tracking-[0.16em] ${plan.popular ? "text-teal-700" : "text-teal-300"}`}>
+                {audiences[index % audiences.length]}
+              </p>
               <h3 className="mt-4 text-xl font-semibold">{plan.name}</h3>
-              <p className="mt-4 text-3xl font-semibold">{plan.annualPrice}<span className="text-base text-slate-500">{plan.cadence}</span></p>
-              <p className="mt-3 min-h-12 text-sm leading-6 text-slate-600">{plan.description}</p>
-              <Link href={plan.href} className="mt-6 inline-flex h-11 w-full items-center justify-center rounded-md bg-teal-600 text-sm font-semibold text-white shadow-md shadow-teal-900/15 transition hover:bg-teal-700">
+              <div className="mt-5 flex flex-wrap items-end gap-1">
+                <p className="text-3xl font-semibold tracking-tight sm:text-4xl">{plan.annualPrice}</p>
+                <span className={`pb-1 text-sm ${plan.popular ? "text-slate-500" : "text-slate-400"}`}>{plan.cadence}</span>
+              </div>
+              <p className={`mt-4 text-sm leading-6 ${plan.popular ? "text-slate-600" : "text-slate-300"}`}>{plan.description}</p>
+              <div className={`my-6 h-px ${plan.popular ? "bg-slate-200" : "bg-white/10"}`} />
+              <p className={`text-xs font-semibold uppercase tracking-wide ${plan.popular ? "text-slate-500" : "text-slate-400"}`}>
+                What&apos;s included
+              </p>
+              <ul className="mt-4 space-y-3">
+                {plan.features.slice(0, 4).map((feature) => (
+                  <li key={feature} className={`flex gap-3 text-sm ${plan.popular ? "text-slate-700" : "text-slate-300"}`}>
+                    <span className={`grid h-5 w-5 shrink-0 place-items-center rounded-full text-[11px] font-bold ${
+                      plan.popular ? "bg-teal-100 text-teal-700" : "bg-teal-300/10 text-teal-300"
+                    }`}>✓</span>
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+              <p className={`mt-5 text-xs ${plan.popular ? "text-slate-500" : "text-slate-400"}`}>
+                {plan.sendLimit} · {plan.overage}
+              </p>
+              <Link
+                href={plan.href}
+                className={`mt-6 inline-flex h-11 w-full items-center justify-center rounded-xl text-sm font-semibold transition ${
+                  plan.popular
+                    ? "bg-slate-950 text-white shadow-lg hover:bg-slate-800"
+                    : "border border-white/15 bg-white/10 text-white hover:border-teal-300/40 hover:bg-white/15"
+                }`}
+              >
                 {plan.cta}
               </Link>
             </div>
