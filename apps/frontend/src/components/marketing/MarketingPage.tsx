@@ -322,7 +322,7 @@ function PricingTeaser({ plans }: { plans: MarketingContent["plans"] }) {
               key={plan.name}
               className={`relative flex flex-col rounded-2xl border p-5 transition duration-300 hover:-translate-y-1 sm:p-6 ${
                 plan.popular
-                  ? "border-teal-300 bg-white text-slate-950 shadow-[0_24px_70px_rgba(20,184,166,0.2)]"
+                  ? "order-first border-teal-300 bg-white text-slate-950 shadow-[0_24px_70px_rgba(20,184,166,0.2)] sm:order-none"
                   : "border-white/10 bg-white/[0.05] text-white backdrop-blur"
               }`}
             >
