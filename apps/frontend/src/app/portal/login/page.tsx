@@ -87,33 +87,71 @@ export default function ClientPortalLoginPage() {
   }
 
   return (
-    <main className="grid min-h-screen bg-[#f5f7fb] px-4 py-10 text-slate-950 sm:px-6 lg:px-8">
-      <section className="m-auto w-full max-w-md rounded-lg border border-slate-200 bg-white p-6 shadow-xl shadow-slate-900/5">
-        <Link href="/" className="inline-flex items-center gap-3">
-          <span className="grid h-10 w-10 place-items-center rounded-md bg-teal-600 text-sm font-bold text-white">
-            IF
-          </span>
-          <span className="font-semibold">InvoiceForge</span>
-        </Link>
+    <main className="min-h-screen bg-[#eef4f4] text-slate-950">
+      <div className="grid min-h-screen lg:grid-cols-[minmax(340px,0.9fr)_minmax(0,1.1fr)]">
+        <aside className="relative hidden overflow-hidden bg-teal-950 p-10 text-white lg:flex lg:flex-col lg:justify-between xl:p-14">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_18%,rgba(45,212,191,0.32),transparent_30%),radial-gradient(circle_at_86%_78%,rgba(56,189,248,0.18),transparent_28%)]" />
+          <div className="brand-dots absolute inset-0 opacity-10" />
+          <Link href="/" className="relative inline-flex items-center gap-3">
+            <span className="grid h-11 w-11 place-items-center rounded-xl bg-white text-sm font-black text-teal-950">IF</span>
+            <span className="text-lg font-bold">InvoiceForge</span>
+          </Link>
+          <div className="relative max-w-lg">
+            <p className="text-xs font-bold uppercase tracking-[0.24em] text-teal-200">Secure client access</p>
+            <h2 className="mt-5 text-4xl font-black leading-tight tracking-tight xl:text-5xl">
+              Everything your company shared, in one private portal.
+            </h2>
+            <p className="mt-5 text-base leading-8 text-teal-100/80">
+              Review proposals, approve documents, download invoices, and make payments from one protected account.
+            </p>
+            <div className="mt-8 space-y-3">
+              {["Company-scoped access", "Protected document history", "Clear payment status"].map((item) => (
+                <div key={item} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                  <span className="grid h-7 w-7 place-items-center rounded-full bg-teal-300 text-xs font-black text-teal-950">+</span>
+                  <span className="text-sm font-semibold">{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <p className="relative text-xs text-teal-100/60">Only documents connected to your client record are visible.</p>
+        </aside>
 
-        <p className="mt-8 text-sm font-semibold uppercase tracking-wide text-teal-700">
-          Client portal
-        </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight">
-          {setupMode ? "Create your password" : "Client sign in"}
-        </h1>
-        <p className="mt-3 text-sm leading-6 text-slate-600">
-          Sign in with the email saved by your company. Access is scoped to your
-          company and your client record.
-        </p>
+        <section className="flex items-center justify-center px-4 py-6 sm:px-8 sm:py-10 lg:px-12">
+          <div className="w-full max-w-md">
+            <div className="mb-5 flex items-center justify-between lg:hidden">
+              <Link href="/" className="inline-flex items-center gap-3">
+                <span className="grid h-10 w-10 place-items-center rounded-xl bg-teal-950 text-sm font-black text-white">IF</span>
+                <span className="font-bold">InvoiceForge</span>
+              </Link>
+              <Link href="/login" className="rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 shadow-sm">
+                Company login
+              </Link>
+            </div>
 
-        <form onSubmit={submit} className="mt-6 grid gap-4">
+            <div className="rounded-[24px] border border-white/80 bg-white p-5 shadow-2xl shadow-teal-950/10 sm:p-8">
+              <div className="flex items-center gap-3">
+                <span className="grid h-11 w-11 place-items-center rounded-xl bg-teal-50 text-sm font-black text-teal-800 ring-1 ring-teal-100">CP</span>
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-teal-700">Client portal</p>
+                  <p className="mt-0.5 text-xs text-slate-500">Private document access</p>
+                </div>
+              </div>
+              <h1 className="mt-6 text-2xl font-bold tracking-tight sm:text-3xl">
+                {setupMode ? "Create your secure password" : "Welcome to your client portal"}
+              </h1>
+              <p className="mt-2 text-sm leading-6 text-slate-600">
+                {setupMode
+                  ? "Complete your account setup to securely access company documents."
+                  : "Use the email address registered by the company that invited you."}
+              </p>
+
+              <form onSubmit={submit} className="mt-6 grid gap-4">
           <Field label="Company ID">
             <input
               value={companyId}
               onChange={(event) => setCompanyId(event.target.value)}
-              placeholder="Optional unless your email is in multiple companies"
-              className="h-11 rounded-md border border-slate-200 px-3 text-sm outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-100"
+              placeholder="Only needed if you use multiple companies"
+              className="h-12 rounded-xl border border-slate-300 px-3 text-sm outline-none transition focus:border-teal-600 focus:ring-4 focus:ring-teal-100"
             />
           </Field>
           <Field label="Email address">
@@ -124,7 +162,7 @@ export default function ClientPortalLoginPage() {
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               placeholder="client@company.com"
-              className="h-11 rounded-md border border-slate-200 px-3 text-sm outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-100"
+              className="h-12 rounded-xl border border-slate-300 px-3 text-sm outline-none transition focus:border-teal-600 focus:ring-4 focus:ring-teal-100"
             />
           </Field>
           <Field label={setupMode ? "New password" : "Password"}>
@@ -147,14 +185,14 @@ export default function ClientPortalLoginPage() {
                   autoComplete="new-password"
                 />
               </Field>
-              <div>
+              <div className="rounded-xl bg-slate-50 p-3">
                 <div className="h-2 rounded-full bg-slate-100">
                   <div
                     className="h-2 rounded-full bg-teal-600 transition-all"
                     style={{ width: `${passwordScore * 20}%` }}
                   />
                 </div>
-                <p className="mt-2 text-xs text-slate-500">
+                <p className="mt-2 text-xs leading-5 text-slate-500">
                   Use 8+ characters with uppercase, lowercase, number, and special character.
                 </p>
               </div>
@@ -175,18 +213,20 @@ export default function ClientPortalLoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="h-11 rounded-md bg-teal-600 text-sm font-semibold text-white shadow-sm hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-60"
+            className="h-12 rounded-xl bg-teal-700 text-sm font-bold text-white shadow-lg shadow-teal-900/15 transition hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {loading ? "Please wait..." : setupMode ? "Create password" : "Login"}
+            {loading ? "Please wait..." : setupMode ? "Create password and continue" : "Sign in securely"}
           </button>
         </form>
 
-        <p className="mt-6 text-sm text-slate-500">
-          <Link href="/portal/forgot-password" className="font-semibold text-teal-700">
-            Forgot password?
-          </Link>
-        </p>
-      </section>
+              <div className="mt-6 flex flex-col gap-3 border-t border-slate-100 pt-5 text-sm sm:flex-row sm:items-center sm:justify-between">
+                <Link href="/portal/forgot-password" className="font-bold text-teal-700">Forgot password?</Link>
+                <Link href="/login" className="font-semibold text-slate-500 hover:text-slate-900">Company team login</Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
     </main>
   );
 }
@@ -194,7 +234,7 @@ export default function ClientPortalLoginPage() {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="grid gap-2">
-      <span className="text-sm font-medium text-slate-700">{label}</span>
+      <span className="text-sm font-semibold text-slate-700">{label}</span>
       {children}
     </label>
   );
@@ -214,7 +254,7 @@ function PasswordInput({
   onToggle: () => void;
 }) {
   return (
-    <div className="flex overflow-hidden rounded-md border border-slate-200 focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-100">
+    <div className="flex overflow-hidden rounded-xl border border-slate-300 bg-white focus-within:border-teal-600 focus-within:ring-4 focus-within:ring-teal-100">
       <input
         required
         minLength={8}
@@ -223,7 +263,7 @@ function PasswordInput({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder="Enter password"
-        className="h-11 min-w-0 flex-1 px-3 text-sm outline-none"
+        className="h-12 min-w-0 flex-1 px-3 text-sm outline-none"
       />
       <button
         type="button"
