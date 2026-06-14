@@ -175,10 +175,10 @@ export default function SuperadminPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f5f7fb] text-slate-950">
-      <div className="flex min-h-screen">
+    <main className="min-h-screen bg-[#f5f7fb] text-slate-950 xl:h-screen xl:overflow-hidden">
+      <div className="flex min-h-screen xl:h-screen xl:min-h-0">
         <SuperadminSidebar active="/superadmin" />
-        <section className="min-w-0 flex-1">
+        <section className="min-w-0 flex-1 xl:h-screen xl:overflow-y-auto xl:overscroll-contain">
           <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/90 backdrop-blur">
             <div className="flex flex-col gap-4 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
               <div>
@@ -314,7 +314,7 @@ export default function SuperadminPage() {
 
 function SuperadminSidebar({ active }: { active: string }) {
   return (
-    <aside className="hidden h-screen w-72 shrink-0 self-start border-r border-slate-200 bg-[#07111f] text-white xl:sticky xl:top-0 xl:flex xl:flex-col">
+    <aside className="hidden h-screen w-72 shrink-0 border-r border-slate-200 bg-[#07111f] text-white xl:flex xl:flex-col">
       <div className="flex h-screen flex-col">
         <div className="border-b border-white/10 px-6 py-5">
           <Link href="/superadmin" className="flex items-center gap-3">

@@ -129,9 +129,9 @@ export function DashboardShell({
   }
 
   return (
-    <main className="company-mobile min-h-screen bg-[#f5f7fb] text-slate-950">
-      <div className="grid min-h-screen lg:grid-cols-[248px_1fr]">
-        <aside className="hidden border-r border-slate-200 bg-[#07111f] text-white lg:sticky lg:top-0 lg:flex lg:h-screen lg:self-start lg:flex-col">
+    <main className="company-mobile min-h-screen bg-[#f5f7fb] text-slate-950 lg:h-screen lg:overflow-hidden">
+      <div className="grid min-h-screen lg:h-screen lg:min-h-0 lg:grid-cols-[248px_1fr]">
+        <aside className="hidden border-r border-slate-200 bg-[#07111f] text-white lg:flex lg:h-screen lg:flex-col">
           <div className="flex h-16 shrink-0 items-center gap-3 border-b border-white/10 px-5">
             <Link href="/dashboard" className="flex min-w-0 items-center gap-3">
               <CompanyLogo branding={branding} size="sm" />
@@ -187,7 +187,7 @@ export function DashboardShell({
           ) : null}
         </aside>
 
-        <section className="min-w-0">
+        <section className="min-w-0 lg:h-screen lg:overflow-y-auto lg:overscroll-contain">
           <header className="sticky top-0 z-30 border-b border-slate-200 bg-white">
             <div className="flex h-16 items-center gap-2 px-3 sm:gap-3 sm:px-6 lg:px-8">
               <Link href="/dashboard" className="flex min-w-0 items-center gap-2 sm:gap-3 lg:hidden">
