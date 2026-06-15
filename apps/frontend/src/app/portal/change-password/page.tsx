@@ -92,7 +92,7 @@ export default function ClientPasswordSettingsPage() {
       }
 
       setMessage(
-        body.delivery?.mode === "log"
+        body.delivery?.mode === "log" && body.smsDelivery?.mode !== "twilio"
           ? "Reset link created. Email delivery is not configured, so check backend logs for local testing."
           : body.message || "Password reset link sent successfully.",
       );

@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  HttpException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -10,6 +11,7 @@ import * as bcrypt from 'bcrypt';
 import { createHash, randomBytes } from 'crypto';
 import { Repository } from 'typeorm';
 import { PortalMailService } from '../portal/portal-mail.service';
+import { PortalSmsService } from '../portal/portal-sms.service';
 import {
   BillingCycle,
   SubscriptionStatus,
@@ -71,6 +73,7 @@ export class AuthService {
     private readonly tenantsRepository: Repository<Tenant>,
     private readonly jwtService: JwtService,
     private readonly portalMailService: PortalMailService,
+    private readonly portalSmsService: PortalSmsService,
   ) {}
 
   async register(request: RegisterRequest): Promise<AuthResponse> {
@@ -198,17 +201,46 @@ export class AuthService {
       1,
       Math.round(this.resetExpiryMs / 60000),
     );
-    const delivery = await this.portalMailService.sendPasswordResetLink({
-      email,
-      resetUrl,
-      accountName: email,
-      subject: 'InvoiceForge password reset',
-      expiresInMinutes,
-      logoUrl: this.absoluteLogoUrl(tenant?.logoUrl),
-      logoAltText: tenant?.logoAltText,
-    });
+    const [emailResult, smsResult] = await Promise.allSettled([
+      this.portalMailService.sendPasswordResetLink({
+        email,
+        resetUrl,
+        accountName: email,
+        subject: 'InvoiceForge password reset',
+        expiresInMinutes,
+        logoUrl: this.absoluteLogoUrl(tenant?.logoUrl),
+        logoAltText: tenant?.logoAltText,
+      }),
+      this.portalSmsService.sendPasswordResetLink({
+        phone: this.readOwnerPasswordResetPhone(),
+        resetUrl,
+        accountName: 'InvoiceForge',
+        expiresInMinutes,
+      }),
+    ]);
+    const delivery =
+      emailResult.status === 'fulfilled'
+        ? emailResult.value
+        : { delivered: false, mode: 'log' as const };
+    const smsDelivery =
+      smsResult.status === 'fulfilled'
+        ? smsResult.value
+        : { delivered: false, mode: 'log' as const };
 
-    return { message: 'Password reset link sent successfully.', delivery };
+    if (!delivery.delivered && !smsDelivery.delivered) {
+      if (emailResult.status === 'rejected') {
+        this.throwDeliveryError(emailResult.reason);
+      }
+      if (smsResult.status === 'rejected') {
+        this.throwDeliveryError(smsResult.reason);
+      }
+    }
+
+    return {
+      message: 'Password reset link sent successfully.',
+      delivery,
+      smsDelivery,
+    };
   }
 
   async resetPassword(request: ResetPasswordRequest) {
@@ -363,6 +395,22 @@ export class AuthService {
       process.env.API_PUBLIC_URL ??
       `http://localhost:${process.env.PORT ?? 3001}`;
     return `${base.replace(/\/$/, '')}${logoUrl}`;
+  }
+
+  private readOwnerPasswordResetPhone(): string | null {
+    return (
+      process.env.TWILIO_OWNER_PASSWORD_RESET_TO ??
+      process.env.TWILIO_PASSWORD_RESET_TO ??
+      null
+    );
+  }
+
+  private throwDeliveryError(reason: unknown): never {
+    if (reason instanceof HttpException) {
+      throw reason;
+    }
+
+    throw new BadRequestException('Could not send reset link.');
   }
 
   private readSuperadminEmail(): string {

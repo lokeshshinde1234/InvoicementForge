@@ -99,4 +99,49 @@ export class AppController {
           : [],
     };
   }
+
+  @Get('health/sms')
+  smsHealth(): {
+    status: 'ready' | 'missing';
+    provider: 'twilio' | 'none';
+    accountSidConfigured: boolean;
+    apiKeySidConfigured: boolean;
+    apiKeySecretConfigured: boolean;
+    senderConfigured: boolean;
+    required: string[];
+  } {
+    const accountSidConfigured = Boolean(process.env.TWILIO_ACCOUNT_SID);
+    const apiKeySidConfigured = Boolean(
+      process.env.TWILIO_API_KEY_SID || process.env.TWILIO_API_KEY,
+    );
+    const apiKeySecretConfigured = Boolean(
+      process.env.TWILIO_API_KEY_SECRET || process.env.TWILIO_API_SECRET,
+    );
+    const senderConfigured = Boolean(
+      process.env.TWILIO_FROM_NUMBER ||
+        process.env.TWILIO_MESSAGING_SERVICE_SID,
+    );
+    const ready =
+      accountSidConfigured &&
+      apiKeySidConfigured &&
+      apiKeySecretConfigured &&
+      senderConfigured;
+
+    return {
+      status: ready ? 'ready' : 'missing',
+      provider: ready ? 'twilio' : 'none',
+      accountSidConfigured,
+      apiKeySidConfigured,
+      apiKeySecretConfigured,
+      senderConfigured,
+      required: ready
+        ? []
+        : [
+            'TWILIO_ACCOUNT_SID',
+            'TWILIO_API_KEY_SID',
+            'TWILIO_API_KEY_SECRET',
+            'TWILIO_FROM_NUMBER or TWILIO_MESSAGING_SERVICE_SID',
+          ],
+    };
+  }
 }

@@ -18,6 +18,7 @@ import {
   PortalController,
 } from './portal.controller';
 import { PortalMailService } from './portal-mail.service';
+import { PortalSmsService } from './portal-sms.service';
 import { PortalService } from './portal.service';
 import { ProposalApprovalDocument } from './proposal-approval-document.entity';
 
@@ -52,6 +53,6 @@ if (!process.env.JWT_SECRET && process.env.NODE_ENV === 'production') {
     ApiClientProposalController,
     ClientPasswordController,
   ],
-  providers: [PortalService, PortalMailService],
+  providers: [PortalService, PortalMailService, PortalSmsService],
 })
 export class PortalModule {}

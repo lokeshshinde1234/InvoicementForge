@@ -17,12 +17,17 @@ export default function ForgotPasswordPage() {
     setError("");
 
     try {
-      const response = await api.post<{ message: string; delivery?: { mode: string } }>(
+      const response = await api.post<{
+        message: string;
+        delivery?: { mode: string };
+        smsDelivery?: { mode: string };
+      }>(
         "/company-owner/forgot-password",
         { email },
       );
       setMessage(
-        response.data.delivery?.mode === "log"
+        response.data.delivery?.mode === "log" &&
+          response.data.smsDelivery?.mode !== "twilio"
           ? "Reset link created. Email delivery is not configured, so check backend logs for local testing."
           : response.data.message,
       );

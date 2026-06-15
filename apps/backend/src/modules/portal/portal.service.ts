@@ -38,6 +38,7 @@ import {
   ClientNotificationType,
 } from './client-notification.entity';
 import { PortalMailService } from './portal-mail.service';
+import { PortalSmsService } from './portal-sms.service';
 import {
   ProposalApprovalDocument,
   ProposalApprovalDocumentStatus,
@@ -235,6 +236,7 @@ export class PortalService {
     private readonly khataRepository: Repository<KhataEntry>,
     private readonly jwtService: JwtService,
     private readonly portalMailService: PortalMailService,
+    private readonly portalSmsService: PortalSmsService,
     private readonly pdfService: PdfService,
   ) {}
 
@@ -267,13 +269,38 @@ export class PortalService {
     );
 
     const expiresInMinutes = Math.max(1, Math.round(this.otpExpiryMs / 60000));
-    const delivery = await this.portalMailService.sendOtp({
-      email,
-      otp,
-      companyName: company.name,
-      clientName: client.name,
-      expiresInMinutes,
-    });
+    const [emailResult, smsResult] = await Promise.allSettled([
+      this.portalMailService.sendOtp({
+        email,
+        otp,
+        companyName: company.name,
+        clientName: client.name,
+        expiresInMinutes,
+      }),
+      this.portalSmsService.sendOtp({
+        phone: client.phone,
+        otp,
+        companyName: company.name,
+        expiresInMinutes,
+      }),
+    ]);
+    const delivery =
+      emailResult.status === 'fulfilled'
+        ? emailResult.value
+        : { delivered: false, mode: 'log' as const };
+    const smsDelivery =
+      smsResult.status === 'fulfilled'
+        ? smsResult.value
+        : { delivered: false, mode: 'log' as const };
+
+    if (!delivery.delivered && !smsDelivery.delivered) {
+      if (emailResult.status === 'rejected') {
+        this.throwDeliveryError(emailResult.reason);
+      }
+      if (smsResult.status === 'rejected') {
+        this.throwDeliveryError(smsResult.reason);
+      }
+    }
 
     return {
       message: 'OTP sent successfully.',
@@ -282,6 +309,7 @@ export class PortalService {
         name: company.name,
       },
       delivery,
+      smsDelivery,
     };
   }
 
@@ -429,17 +457,46 @@ export class PortalService {
       1,
       Math.round(this.resetExpiryMs / 60000),
     );
-    const delivery = await this.portalMailService.sendPasswordResetLink({
-      email,
-      resetUrl,
-      accountName: client.name,
-      subject: `${company.name} client portal password reset`,
-      expiresInMinutes,
-      logoUrl: this.absoluteLogoUrl(company.logoUrl),
-      logoAltText: company.logoAltText,
-    });
+    const [emailResult, smsResult] = await Promise.allSettled([
+      this.portalMailService.sendPasswordResetLink({
+        email,
+        resetUrl,
+        accountName: client.name,
+        subject: `${company.name} client portal password reset`,
+        expiresInMinutes,
+        logoUrl: this.absoluteLogoUrl(company.logoUrl),
+        logoAltText: company.logoAltText,
+      }),
+      this.portalSmsService.sendPasswordResetLink({
+        phone: client.phone,
+        resetUrl,
+        accountName: company.name,
+        expiresInMinutes,
+      }),
+    ]);
+    const delivery =
+      emailResult.status === 'fulfilled'
+        ? emailResult.value
+        : { delivered: false, mode: 'log' as const };
+    const smsDelivery =
+      smsResult.status === 'fulfilled'
+        ? smsResult.value
+        : { delivered: false, mode: 'log' as const };
 
-    return { message: 'Password reset link sent successfully.', delivery };
+    if (!delivery.delivered && !smsDelivery.delivered) {
+      if (emailResult.status === 'rejected') {
+        this.throwDeliveryError(emailResult.reason);
+      }
+      if (smsResult.status === 'rejected') {
+        this.throwDeliveryError(smsResult.reason);
+      }
+    }
+
+    return {
+      message: 'Password reset link sent successfully.',
+      delivery,
+      smsDelivery,
+    };
   }
 
   async resetPassword(body: {
@@ -1452,6 +1509,14 @@ export class PortalService {
       process.env.API_PUBLIC_URL ??
       `http://localhost:${process.env.PORT ?? 3001}`;
     return `${base.replace(/\/$/, '')}${logoUrl}`;
+  }
+
+  private throwDeliveryError(reason: unknown): never {
+    if (reason instanceof HttpException) {
+      throw reason;
+    }
+
+    throw new BadRequestException('Could not send reset link or OTP.');
   }
 
   private async ensureDueReminderNotifications(

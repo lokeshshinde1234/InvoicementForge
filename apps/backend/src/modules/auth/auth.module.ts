@@ -4,6 +4,7 @@ import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import '../../load-env';
 import { PortalMailService } from '../portal/portal-mail.service';
+import { PortalSmsService } from '../portal/portal-sms.service';
 import { Tenant } from '../tenants/tenant.entity';
 import { User } from '../users/user.entity';
 import {
@@ -40,7 +41,13 @@ if (!process.env.JWT_SECRET) {
     CompanyOwnerAuthController,
     CompanySignupController,
   ],
-  providers: [AuthService, JwtStrategy, JwtAuthGuard, PortalMailService],
+  providers: [
+    AuthService,
+    JwtStrategy,
+    JwtAuthGuard,
+    PortalMailService,
+    PortalSmsService,
+  ],
   exports: [AuthService, JwtAuthGuard],
 })
 export class AuthModule {}
