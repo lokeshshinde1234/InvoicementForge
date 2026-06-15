@@ -78,6 +78,13 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
+      <head>
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4585882044751118"
+          crossOrigin="anonymous"
+        />
+      </head>
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <script
           type="application/ld+json"
