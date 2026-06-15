@@ -44,20 +44,30 @@ const hasMailFrom = Boolean(
     process.env.EMAIL_FROM ||
     process.env.MAIL_FROM_ADDRESS ||
     process.env.SENDER_EMAIL ||
-    process.env.RESEND_FROM,
+    process.env.RESEND_FROM ||
+    process.env.SENDGRID_FROM,
 );
 const hasResend = Boolean(process.env.RESEND_API_KEY && hasMailFrom);
+const hasSendGrid = Boolean(
+  (process.env.SENDGRID_API_KEY || process.env.TWILIO_SENDGRID_API_KEY) &&
+    hasMailFrom,
+);
 if (process.env.NODE_ENV === 'production') {
-  if (!hasMailFrom) missing.push('SMTP_FROM, EMAIL_FROM, or RESEND_FROM');
-  if (!hasResend && !hasSmtpHost && !hasSmtpUrl) {
-    missing.push('SMTP_HOST, SMTP_URL, or RESEND_API_KEY');
+  if (!hasMailFrom) {
+    missing.push('SMTP_FROM, EMAIL_FROM, RESEND_FROM, or SENDGRID_FROM');
+  }
+  if (!hasResend && !hasSendGrid && !hasSmtpHost && !hasSmtpUrl) {
+    missing.push('SMTP_HOST, SMTP_URL, RESEND_API_KEY, or SENDGRID_API_KEY');
   }
 }
 if (missing.length === 0) {
   console.log('All required env vars present.');
-  if (!hasMailFrom || (!hasResend && !hasSmtpHost && !hasSmtpUrl)) {
+  if (
+    !hasMailFrom ||
+    (!hasResend && !hasSendGrid && !hasSmtpHost && !hasSmtpUrl)
+  ) {
     console.warn(
-      'Warning: Email is not fully configured. Set RESEND_API_KEY plus RESEND_FROM, or set SMTP_FROM plus SMTP_HOST/SMTP_URL.',
+      'Warning: Email is not fully configured. Set RESEND_API_KEY plus RESEND_FROM, SENDGRID_API_KEY plus SENDGRID_FROM, or set SMTP_FROM plus SMTP_HOST/SMTP_URL.',
     );
   }
   const smtpPort =

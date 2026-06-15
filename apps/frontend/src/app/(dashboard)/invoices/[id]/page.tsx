@@ -59,7 +59,7 @@ type SendInvoiceResult = {
   status: string;
   sent: boolean;
   delivered: boolean;
-  deliveryMode: "smtp" | "log";
+  deliveryMode: "smtp" | "resend" | "sendgrid" | "log";
   clientEmail: string;
 };
 

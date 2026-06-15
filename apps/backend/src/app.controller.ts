@@ -22,11 +22,12 @@ export class AppController {
   @Get('health/email')
   emailHealth(): {
     status: 'ready' | 'missing';
-    provider: 'resend' | 'smtp' | 'none';
+    provider: 'resend' | 'sendgrid' | 'smtp' | 'none';
     fromConfigured: boolean;
     hostConfigured: boolean;
     urlConfigured: boolean;
     resendConfigured: boolean;
+    sendGridConfigured: boolean;
     smtpPort: number | null;
     smtpSecure: boolean | null;
     required: string[];
@@ -37,7 +38,8 @@ export class AppController {
         process.env.EMAIL_FROM ||
         process.env.MAIL_FROM_ADDRESS ||
         process.env.SENDER_EMAIL ||
-        process.env.RESEND_FROM,
+        process.env.RESEND_FROM ||
+        process.env.SENDGRID_FROM,
     );
     const hostConfigured = Boolean(
       process.env.SMTP_HOST ||
@@ -52,6 +54,9 @@ export class AppController {
         process.env.EMAIL_SERVER_URL,
     );
     const resendConfigured = Boolean(process.env.RESEND_API_KEY);
+    const sendGridConfigured = Boolean(
+      process.env.SENDGRID_API_KEY || process.env.TWILIO_SENDGRID_API_KEY,
+    );
     const smtpPortValue =
       process.env.SMTP_PORT ??
       process.env.MAIL_PORT ??
@@ -68,9 +73,11 @@ export class AppController {
     const provider =
       resendConfigured && fromConfigured
         ? 'resend'
-        : fromConfigured && (hostConfigured || urlConfigured)
-          ? 'smtp'
-          : 'none';
+        : sendGridConfigured && fromConfigured
+          ? 'sendgrid'
+          : fromConfigured && (hostConfigured || urlConfigured)
+            ? 'smtp'
+            : 'none';
 
     return {
       status: provider === 'none' ? 'missing' : 'ready',
@@ -79,12 +86,14 @@ export class AppController {
       hostConfigured,
       urlConfigured,
       resendConfigured,
+      sendGridConfigured,
       smtpPort: Number.isFinite(smtpPort) ? smtpPort : null,
       smtpSecure,
       required:
         provider === 'none'
           ? [
               'RESEND_API_KEY + RESEND_FROM',
+              'or SENDGRID_API_KEY + SENDGRID_FROM',
               'or SMTP_HOST/SMTP_URL + SMTP_FROM',
             ]
           : [],

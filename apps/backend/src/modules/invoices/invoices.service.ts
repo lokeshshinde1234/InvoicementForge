@@ -52,7 +52,7 @@ export type SendInvoiceResult = {
   status: InvoiceStatus;
   sent: boolean;
   delivered: boolean;
-  deliveryMode: 'smtp' | 'resend' | 'log';
+  deliveryMode: 'smtp' | 'resend' | 'sendgrid' | 'log';
   clientEmail: string;
 };
 

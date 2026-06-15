@@ -3,7 +3,7 @@ import {
   Logger,
   ServiceUnavailableException,
 } from '@nestjs/common';
-import { existsSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import {
   createTransport,
   type SentMessageInfo,
@@ -26,7 +26,14 @@ type EmailSettings =
       provider: 'resend';
       apiKey: string;
       from: string;
+    }
+  | {
+      provider: 'sendgrid';
+      apiKey: string;
+      from: string;
     };
+
+type EmailDeliveryMode = EmailSettings['provider'] | 'log';
 
 @Injectable()
 export class PortalMailService {
@@ -44,7 +51,7 @@ export class PortalMailService {
     companyName: string;
     clientName: string;
     expiresInMinutes: number;
-  }): Promise<{ delivered: boolean; mode: 'smtp' | 'resend' | 'log' }> {
+  }): Promise<{ delivered: boolean; mode: EmailDeliveryMode }> {
     const safeCompanyName = this.escapeHtml(companyName);
     const safeClientName = this.escapeHtml(clientName);
     const settings = this.readEmailSettings(
@@ -95,7 +102,7 @@ export class PortalMailService {
     expiresInMinutes: number;
     logoUrl?: string | null;
     logoAltText?: string | null;
-  }): Promise<{ delivered: boolean; mode: 'smtp' | 'resend' | 'log' }> {
+  }): Promise<{ delivered: boolean; mode: EmailDeliveryMode }> {
     const safeAccountName = this.escapeHtml(accountName);
     const safeResetUrl = this.escapeHtml(resetUrl);
     const logo = this.resolveEmailLogo(logoUrl);
@@ -167,7 +174,7 @@ export class PortalMailService {
     currency: string;
     dueDate: string | Date;
     portalUrl: string;
-  }): Promise<{ delivered: boolean; mode: 'smtp' | 'resend' | 'log' }> {
+  }): Promise<{ delivered: boolean; mode: EmailDeliveryMode }> {
     const safeClientName = this.escapeHtml(clientName);
     const safeCompanyName = this.escapeHtml(companyName);
     const safeInvoiceNumber = this.escapeHtml(invoiceNumber);
@@ -322,6 +329,9 @@ export class PortalMailService {
     logFallbackMessage: string,
   ): EmailSettings | null {
     const resendApiKey = process.env.RESEND_API_KEY?.trim();
+    const sendGridApiKey =
+      process.env.SENDGRID_API_KEY?.trim() ??
+      process.env.TWILIO_SENDGRID_API_KEY?.trim();
     const url =
       process.env.SMTP_URL ??
       process.env.MAIL_URL ??
@@ -334,6 +344,7 @@ export class PortalMailService {
       process.env.MAIL_FROM_ADDRESS ??
       process.env.SENDER_EMAIL ??
       process.env.RESEND_FROM ??
+      process.env.SENDGRID_FROM ??
       process.env.SMTP_USER ??
       process.env.MAIL_USER ??
       process.env.EMAIL_SERVER_USER;
@@ -366,6 +377,10 @@ export class PortalMailService {
 
     if (resendApiKey && from) {
       return { provider: 'resend', apiKey: resendApiKey, from };
+    }
+
+    if (sendGridApiKey && from) {
+      return { provider: 'sendgrid', apiKey: sendGridApiKey, from };
     }
 
     if (
@@ -404,6 +419,11 @@ export class PortalMailService {
       return;
     }
 
+    if (settings.provider === 'sendgrid') {
+      await this.sendSendGridMail(settings, mail);
+      return;
+    }
+
     const transporter = this.createSmtpTransport(settings);
 
     try {
@@ -429,6 +449,57 @@ export class PortalMailService {
       throw new ServiceUnavailableException(this.smtpFailureMessage(code));
     } finally {
       transporter.close();
+    }
+  }
+
+  private async sendSendGridMail(
+    settings: Extract<EmailSettings, { provider: 'sendgrid' }>,
+    mail: SendMailOptions,
+  ): Promise<void> {
+    try {
+      const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${settings.apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          personalizations: [
+            {
+              to: this.normalizeEnvelopeRecipients(mail.to).map((email) => ({
+                email,
+              })),
+              subject: mail.subject,
+            },
+          ],
+          from: this.createSendGridAddress(settings.from),
+          content: [
+            ...(typeof mail.text === 'string'
+              ? [{ type: 'text/plain', value: mail.text }]
+              : []),
+            ...(typeof mail.html === 'string'
+              ? [{ type: 'text/html', value: mail.html }]
+              : []),
+          ],
+          attachments: this.createSendGridAttachments(mail.attachments),
+        }),
+      });
+
+      if (!response.ok) {
+        const body = await response.text().catch(() => '');
+        throw new Error(body || `SendGrid HTTP ${response.status}`);
+      }
+
+      this.logger.log(`SendGrid email accepted for ${String(mail.to)}.`);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Unknown SendGrid error';
+      this.logger.error(
+        `SendGrid delivery failed for ${String(mail.to)}: ${message}`,
+      );
+      throw new ServiceUnavailableException(
+        'Email could not be delivered right now. Please verify SENDGRID_API_KEY and SENDGRID_FROM.',
+      );
     }
   }
 
@@ -503,6 +574,62 @@ export class PortalMailService {
   private extractEmailAddress(value?: string): string | undefined {
     const match = value?.match(/<([^>]+)>/);
     return (match?.[1] ?? value)?.trim() || undefined;
+  }
+
+  private createSendGridAddress(value: string): {
+    email: string;
+    name?: string;
+  } {
+    const email = this.extractEmailAddress(value) ?? value;
+    const name = value.includes('<')
+      ? value.replace(/<[^>]+>/, '').trim().replace(/^"|"$/g, '')
+      : undefined;
+
+    return name ? { email, name } : { email };
+  }
+
+  private createSendGridAttachments(
+    attachments: SendMailOptions['attachments'],
+  ):
+    | {
+        content: string;
+        filename: string;
+        type?: string;
+        disposition?: string;
+        content_id?: string;
+      }[]
+    | undefined {
+    if (!Array.isArray(attachments)) return undefined;
+
+    const encoded = attachments.flatMap((attachment) => {
+      if (
+        !attachment ||
+        typeof attachment !== 'object' ||
+        !('path' in attachment) ||
+        typeof attachment.path !== 'string'
+      ) {
+        return [];
+      }
+
+      return [
+        {
+          content: readFileSync(attachment.path).toString('base64'),
+          filename:
+            typeof attachment.filename === 'string'
+              ? attachment.filename
+              : 'attachment',
+          type:
+            typeof attachment.contentType === 'string'
+              ? attachment.contentType
+              : undefined,
+          disposition: attachment.cid ? 'inline' : 'attachment',
+          content_id:
+            typeof attachment.cid === 'string' ? attachment.cid : undefined,
+        },
+      ];
+    });
+
+    return encoded.length > 0 ? encoded : undefined;
   }
 
   private smtpFailureMessage(code: string): string {
