@@ -3,6 +3,7 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
+  ServiceUnavailableException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -1513,10 +1514,14 @@ export class PortalService {
 
   private throwDeliveryError(reason: unknown): never {
     if (reason instanceof HttpException) {
-      throw reason;
+      throw new ServiceUnavailableException(
+        'Could not send the reset link or OTP by email or SMS. Please verify email settings, Twilio SMS settings, and the client phone number.',
+      );
     }
 
-    throw new BadRequestException('Could not send reset link or OTP.');
+    throw new ServiceUnavailableException(
+      'Could not send the reset link or OTP by email or SMS. Please verify email settings, Twilio SMS settings, and the client phone number.',
+    );
   }
 
   private async ensureDueReminderNotifications(

@@ -3,6 +3,7 @@ import {
   ConflictException,
   HttpException,
   Injectable,
+  ServiceUnavailableException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -407,10 +408,14 @@ export class AuthService {
 
   private throwDeliveryError(reason: unknown): never {
     if (reason instanceof HttpException) {
-      throw reason;
+      throw new ServiceUnavailableException(
+        'Could not send reset link by email or SMS. Please verify email settings, Twilio SMS settings, and the reset recipient phone number.',
+      );
     }
 
-    throw new BadRequestException('Could not send reset link.');
+    throw new ServiceUnavailableException(
+      'Could not send reset link by email or SMS. Please verify email settings, Twilio SMS settings, and the reset recipient phone number.',
+    );
   }
 
   private readSuperadminEmail(): string {
