@@ -25,12 +25,7 @@ export default function ForgotPasswordPage() {
         "/company-owner/forgot-password",
         { email },
       );
-      setMessage(
-        response.data.delivery?.mode === "log" &&
-          response.data.smsDelivery?.mode !== "twilio"
-          ? "Reset link created. Email delivery is not configured, so check backend logs for local testing."
-          : response.data.message,
-      );
+      setMessage(readDeliveryMessage(response.data));
     } catch (requestError) {
       const fallback = "Could not send reset link.";
       setError(readApiMessage(requestError, fallback));
@@ -74,4 +69,16 @@ function readApiMessage(error: unknown, fallback: string): string {
     return message ?? fallback;
   }
   return fallback;
+}
+
+function readDeliveryMessage(data: {
+  message: string;
+  delivery?: { mode: string };
+  smsDelivery?: { mode: string };
+}): string {
+  if (data.delivery?.mode !== "log") return data.message;
+  if (data.smsDelivery?.mode === "twilio") {
+    return "Reset link sent by SMS. Email delivery is not available right now.";
+  }
+  return "Reset link created. Email delivery is not configured, so check backend logs for local testing.";
 }

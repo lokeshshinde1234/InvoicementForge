@@ -91,11 +91,7 @@ export default function ClientPasswordSettingsPage() {
         throw new Error(body.message || "Could not send reset link.");
       }
 
-      setMessage(
-        body.delivery?.mode === "log" && body.smsDelivery?.mode !== "twilio"
-          ? "Reset link created. Email delivery is not configured, so check backend logs for local testing."
-          : body.message || "Password reset link sent successfully.",
-      );
+      setMessage(readDeliveryMessage(body));
     } catch (requestError) {
       setError(
         requestError instanceof Error
@@ -274,4 +270,18 @@ function getPasswordScore(password: string): number {
     /[0-9]/.test(password),
     /[^A-Za-z0-9]/.test(password),
   ].filter(Boolean).length;
+}
+
+function readDeliveryMessage(body: {
+  message?: string;
+  delivery?: { mode?: string };
+  smsDelivery?: { mode?: string };
+}): string {
+  if (body.delivery?.mode !== "log") {
+    return body.message || "Password reset link sent successfully.";
+  }
+  if (body.smsDelivery?.mode === "twilio") {
+    return "Reset link sent by SMS. Email delivery is not available right now.";
+  }
+  return "Reset link created. Email delivery is not configured, so check backend logs for local testing.";
 }

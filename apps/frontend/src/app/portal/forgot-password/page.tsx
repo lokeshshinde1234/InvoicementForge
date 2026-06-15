@@ -29,11 +29,7 @@ export default function ClientForgotPasswordPage() {
         throw new Error(body.message || "Invalid credentials or client not registered.");
       }
 
-      setMessage(
-        body.delivery?.mode === "log" && body.smsDelivery?.mode !== "twilio"
-          ? "Reset link created. Email delivery is not configured, so check backend logs for local testing."
-          : body.message || "Password reset link sent successfully.",
-      );
+      setMessage(readDeliveryMessage(body));
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "Something went wrong.");
     } finally {
@@ -63,4 +59,18 @@ export default function ClientForgotPasswordPage() {
       </section>
     </main>
   );
+}
+
+function readDeliveryMessage(body: {
+  message?: string;
+  delivery?: { mode?: string };
+  smsDelivery?: { mode?: string };
+}): string {
+  if (body.delivery?.mode !== "log") {
+    return body.message || "Password reset link sent successfully.";
+  }
+  if (body.smsDelivery?.mode === "twilio") {
+    return "Reset link sent by SMS. Email delivery is not available right now.";
+  }
+  return "Reset link created. Email delivery is not configured, so check backend logs for local testing.";
 }
