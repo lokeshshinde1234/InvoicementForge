@@ -108,6 +108,7 @@ export class AppController {
     apiKeySidConfigured: boolean;
     apiKeySecretConfigured: boolean;
     senderConfigured: boolean;
+    ownerResetRecipientConfigured: boolean;
     required: string[];
   } {
     const accountSidConfigured = Boolean(process.env.TWILIO_ACCOUNT_SID);
@@ -120,6 +121,10 @@ export class AppController {
     const senderConfigured = Boolean(
       process.env.TWILIO_FROM_NUMBER ||
         process.env.TWILIO_MESSAGING_SERVICE_SID,
+    );
+    const ownerResetRecipientConfigured = Boolean(
+      process.env.TWILIO_OWNER_PASSWORD_RESET_TO ||
+        process.env.TWILIO_PASSWORD_RESET_TO,
     );
     const ready =
       accountSidConfigured &&
@@ -134,6 +139,7 @@ export class AppController {
       apiKeySidConfigured,
       apiKeySecretConfigured,
       senderConfigured,
+      ownerResetRecipientConfigured,
       required: ready
         ? []
         : [

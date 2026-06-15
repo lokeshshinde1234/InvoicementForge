@@ -409,12 +409,12 @@ export class AuthService {
   private throwDeliveryError(reason: unknown): never {
     if (reason instanceof HttpException) {
       throw new ServiceUnavailableException(
-        'Could not send reset link by email or SMS. Please verify email settings, Twilio SMS settings, and the reset recipient phone number.',
+        'Could not send owner reset link by email or SMS. Please verify email settings, Twilio SMS settings, and TWILIO_OWNER_PASSWORD_RESET_TO.',
       );
     }
 
     throw new ServiceUnavailableException(
-      'Could not send reset link by email or SMS. Please verify email settings, Twilio SMS settings, and the reset recipient phone number.',
+      'Could not send owner reset link by email or SMS. Please verify email settings, Twilio SMS settings, and TWILIO_OWNER_PASSWORD_RESET_TO.',
     );
   }
 
