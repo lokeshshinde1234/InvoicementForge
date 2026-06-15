@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
+import { setDefaultResultOrder } from 'dns';
 import express, { NextFunction, Request, Response } from 'express';
 import { join } from 'path';
 import { AppModule } from './app.module';
@@ -11,6 +12,9 @@ type RateLimitBucket = {
 
 const isProduction = process.env.NODE_ENV === 'production';
 const requestBodyLimit = process.env.REQUEST_BODY_LIMIT ?? '2mb';
+setDefaultResultOrder(
+  process.env.DNS_RESULT_ORDER === 'verbatim' ? 'verbatim' : 'ipv4first',
+);
 
 async function bootstrap() {
   const server = express();

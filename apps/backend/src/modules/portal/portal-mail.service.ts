@@ -9,6 +9,7 @@ import {
   type SentMessageInfo,
   type SendMailOptions,
 } from 'nodemailer';
+import type SMTPTransport from 'nodemailer/lib/smtp-transport';
 import { join, normalize } from 'path';
 
 type SmtpSettings = {
@@ -302,8 +303,9 @@ export class PortalMailService {
       process.env.SMTP_TLS_REJECT_UNAUTHORIZED ??
         process.env.MAIL_TLS_REJECT_UNAUTHORIZED,
     );
+    const name = process.env.SMTP_NAME ?? process.env.MAIL_NAME;
 
-    return createTransport({
+    const options: SMTPTransport.Options = {
       service,
       host,
       port: port ?? 587,
@@ -311,7 +313,7 @@ export class PortalMailService {
       ignoreTLS,
       requireTLS,
       auth: user && pass ? { user, pass } : undefined,
-      name: process.env.SMTP_NAME ?? process.env.MAIL_NAME,
+      ...(name ? { name } : {}),
       connectionTimeout: Number(
         process.env.SMTP_CONNECTION_TIMEOUT_MS ?? 10000,
       ),
@@ -321,7 +323,9 @@ export class PortalMailService {
         rejectUnauthorized === undefined
           ? undefined
           : { rejectUnauthorized },
-    });
+    };
+
+    return createTransport(options);
   }
 
   private readEmailSettings(
