@@ -1,4 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
+import { getDefaultResultOrder } from 'dns';
+import { createTransport } from 'nodemailer';
+import type SMTPTransport from 'nodemailer/lib/smtp-transport';
 import { AppService } from './app.service';
 
 @Controller()
@@ -100,6 +103,75 @@ export class AppController {
     };
   }
 
+  @Get('health/email/verify')
+  async emailVerify(): Promise<{
+    status: 'ready' | 'error' | 'missing';
+    provider: 'smtp' | 'none';
+    dnsResultOrder: string;
+    smtpHostConfigured: boolean;
+    smtpPort: number | null;
+    smtpSecure: boolean;
+    smtpUserConfigured: boolean;
+    smtpFromConfigured: boolean;
+    errorCode?: string;
+    errorMessage?: string;
+  }> {
+    const smtp = this.readSmtpHealthSettings();
+
+    if (!smtp.host || !smtp.from) {
+      return {
+        status: 'missing',
+        provider: 'none',
+        dnsResultOrder: getDefaultResultOrder(),
+        smtpHostConfigured: Boolean(smtp.host),
+        smtpPort: smtp.port,
+        smtpSecure: smtp.secure,
+        smtpUserConfigured: Boolean(smtp.user),
+        smtpFromConfigured: Boolean(smtp.from),
+      };
+    }
+
+    const transporter = createTransport({
+      host: smtp.host,
+      port: smtp.port ?? 587,
+      secure: smtp.secure,
+      auth: smtp.user && smtp.pass ? { user: smtp.user, pass: smtp.pass } : undefined,
+      connectionTimeout: Number(process.env.SMTP_CONNECTION_TIMEOUT_MS ?? 10000),
+      greetingTimeout: Number(process.env.SMTP_GREETING_TIMEOUT_MS ?? 10000),
+      socketTimeout: Number(process.env.SMTP_SOCKET_TIMEOUT_MS ?? 20000),
+    } satisfies SMTPTransport.Options);
+
+    try {
+      await transporter.verify();
+
+      return {
+        status: 'ready',
+        provider: 'smtp',
+        dnsResultOrder: getDefaultResultOrder(),
+        smtpHostConfigured: true,
+        smtpPort: smtp.port,
+        smtpSecure: smtp.secure,
+        smtpUserConfigured: Boolean(smtp.user),
+        smtpFromConfigured: true,
+      };
+    } catch (error) {
+      return {
+        status: 'error',
+        provider: 'smtp',
+        dnsResultOrder: getDefaultResultOrder(),
+        smtpHostConfigured: true,
+        smtpPort: smtp.port,
+        smtpSecure: smtp.secure,
+        smtpUserConfigured: Boolean(smtp.user),
+        smtpFromConfigured: true,
+        errorCode: this.readErrorCode(error),
+        errorMessage: this.readSafeErrorMessage(error),
+      };
+    } finally {
+      transporter.close();
+    }
+  }
+
   @Get('health/sms')
   smsHealth(): {
     status: 'ready' | 'missing';
@@ -149,5 +221,71 @@ export class AppController {
             'TWILIO_FROM_NUMBER or TWILIO_MESSAGING_SERVICE_SID',
           ],
     };
+  }
+
+  private readSmtpHealthSettings(): {
+    host?: string;
+    port: number | null;
+    secure: boolean;
+    user?: string;
+    pass?: string;
+    from?: string;
+  } {
+    const port = Number(
+      process.env.SMTP_PORT ??
+        process.env.MAIL_PORT ??
+        process.env.EMAIL_PORT ??
+        process.env.EMAIL_SERVER_PORT ??
+        587,
+    );
+    const secureValue = process.env.SMTP_SECURE ?? process.env.MAIL_SECURE;
+
+    return {
+      host:
+        process.env.SMTP_HOST ??
+        process.env.MAIL_HOST ??
+        process.env.EMAIL_HOST ??
+        process.env.EMAIL_SERVER_HOST,
+      port: Number.isFinite(port) ? port : null,
+      secure:
+        secureValue === undefined
+          ? port === 465
+          : ['1', 'true', 'yes', 'on'].includes(
+              secureValue.trim().toLowerCase(),
+            ),
+      user:
+        process.env.SMTP_USER ??
+        process.env.MAIL_USER ??
+        process.env.EMAIL_USER ??
+        process.env.EMAIL_SERVER_USER,
+      pass:
+        process.env.SMTP_PASS ??
+        process.env.MAIL_PASS ??
+        process.env.EMAIL_PASS ??
+        process.env.SMTP_PASSWORD ??
+        process.env.MAIL_PASSWORD ??
+        process.env.EMAIL_SERVER_PASSWORD,
+      from:
+        process.env.SMTP_FROM ??
+        process.env.MAIL_FROM ??
+        process.env.EMAIL_FROM ??
+        process.env.MAIL_FROM_ADDRESS ??
+        process.env.SENDER_EMAIL,
+    };
+  }
+
+  private readErrorCode(error: unknown): string {
+    return typeof error === 'object' && error && 'code' in error
+      ? String((error as { code?: unknown }).code)
+      : 'SMTP_ERROR';
+  }
+
+  private readSafeErrorMessage(error: unknown): string {
+    const message = error instanceof Error ? error.message : 'Unknown SMTP error';
+
+    return message.replace(
+      /(AUTH PLAIN\s+)[A-Za-z0-9+/=]+/gi,
+      '$1[redacted]',
+    );
   }
 }
